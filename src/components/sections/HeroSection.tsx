@@ -449,7 +449,7 @@ export default function HeroSection() {
             and a line there would read as a seam. */}
         <div className="hero-strip relative z-10 bg-surface py-8">
           <div className="mx-auto max-w-site px-4 sm:px-6 lg:px-10">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
               {FEATURES.map(({ label, detail, Icon }) => (
                 <div key={label} className="group/f flex items-start gap-3">
                   <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest-500/10 text-forest-700 ring-1 ring-inset ring-forest-700/12 transition-colors duration-300 group-hover/f:bg-forest-500 group-hover/f:text-white">
