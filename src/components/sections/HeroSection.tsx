@@ -202,13 +202,28 @@ export default function HeroSection() {
         }}
       >
         {/* ---------- video stage ---------- */}
-        {/* pt-32 reserves room for the fixed header: content is vertically centred,
-          so on a short viewport the award cluster would ride up under the pill.
-          pb offsets it so the block stays optically centred. */}
-        {/* `min-h` steps down on small screens: 36rem plus the pt-32 header
-            reserve is taller than a small phone's viewport, which pushed the
-            CTAs below the fold on the one screen where they matter most. */}
-        <div className="relative flex h-[86vh] min-h-[30rem] flex-col items-center justify-center overflow-hidden bg-forest-950 px-4 pb-10 pt-24 sm:min-h-[36rem] sm:px-6 sm:pb-12 sm:pt-32 lg:px-10">
+        {/* pt-24/32 reserves room for the fixed header: content is vertically
+          centred, so on a short viewport the eyebrow cluster would ride up under
+          the pill. pb offsets it so the block stays optically centred.
+
+          Height is deliberately asymmetric across breakpoints:
+
+          • Mobile — `min-h`, NOT `h`. A fixed 86vh box is shorter than this copy
+            block on a phone (four eyebrow items + a 3-line headline + 4-line sub
+            + two stacked CTAs), so the panel clipped its own buttons. A minimum
+            keeps the panel filling the fold when the copy is short, and lets it
+            grow instead of overflowing when it isn't.
+          • sm and up — the fixed `h-[86vh]` stage from the reference, where the
+            copy comfortably fits and the strip's top edge should peek above the
+            fold.
+
+          `svh`, not `vh`: mobile browsers size `vh` against the LARGEST viewport
+          (chrome hidden), so a 86vh panel is taller than what is actually visible
+          while the URL bar is showing — the exact overflow in the screenshot.
+          The small viewport unit measures the always-visible area, and unlike
+          `dvh` it does not resize as the bar collapses, so nothing reflows
+          mid-scroll. */}
+        <div className="relative flex min-h-[max(34rem,100svh-1rem)] flex-col items-center justify-center overflow-hidden bg-forest-950 px-4 pb-12 pt-24 sm:h-[86svh] sm:min-h-[36rem] sm:px-6 sm:pb-12 sm:pt-32 lg:px-10">
           {/* Layering here is all POSITIVE z-index on purpose.
 
               A negative z-index puts an element behind its own parent's
@@ -307,7 +322,7 @@ export default function HeroSection() {
                 outside world, so they can only ship once they are true. What the
                 product DOES needs no third-party proof, so this states capability
                 instead. Swap in a real rating once you have one. */}
-            <div className="hero-award flex flex-col items-center gap-5">
+            <div className="hero-award flex flex-col items-center gap-4 sm:gap-5">
               {/* Typographic eyebrow, not a badge.
                   A translucent pill with a pulsing dot is the single most
                   recognisable AI-generated hero pattern, so this uses an editorial
@@ -361,7 +376,7 @@ export default function HeroSection() {
                 widened to 5xl so it settles at two lines on desktop rather than
                 three. */}
             <h1
-              className="hero-headline mt-8 max-w-5xl text-balance font-display text-[clamp(1.85rem,7.5vw,4.75rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-white"
+              className="hero-headline mt-6 max-w-5xl text-balance font-display text-[clamp(1.85rem,7.5vw,4.75rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-white sm:mt-8"
               style={{ textShadow: "0 2px 34px rgba(3,26,16,0.55), 0 1px 3px rgba(3,26,16,0.4)" }}
             >
               Your AI tutor that turns any textbook into{" "}
@@ -375,12 +390,12 @@ export default function HeroSection() {
 
             {/* Wider measure than the old max-w-2xl so this also lands in two
                 lines on desktop and reads as one statement, not a paragraph. */}
-            <p className="hero-sub mt-7 max-w-3xl text-pretty text-[1.09375rem] leading-relaxed text-white/80 sm:text-[1.25rem]">
+            <p className="hero-sub mt-5 max-w-3xl text-pretty text-[1.03125rem] leading-relaxed text-white/80 sm:mt-7 sm:text-[1.25rem]">
               Open your textbook, chat through any chapter, and practise with AI-generated tests
               that adapt to you, with analytics that show exactly where you stand.
             </p>
 
-            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col items-center gap-3 sm:mt-9 sm:flex-row">
               <span className="hero-cta">
                 <MagneticButton
                   as="a"

@@ -335,7 +335,11 @@ export function SiteHeader() {
               {...EXTERNAL_LINK_PROPS}
                 variant="ghost"
                 size="sm"
-                className="gsap-h-item hidden sm:inline-flex"
+                /* `md`, not `sm`, to match the CTA beside it and the burger's own
+                   `md:hidden`. At sm this appeared alongside the hamburger, so
+                   the bar showed a nav link and the menu that duplicates it. One
+                   breakpoint now switches the whole action cluster at once. */
+                className="gsap-h-item hidden md:inline-flex"
               >
                 Sign in
               </MagneticButton>
@@ -347,7 +351,11 @@ export function SiteHeader() {
                 variant="ink"
                 size="sm"
                 roll={false}
-                className="gsap-h-item group"
+                /* Hidden below md, where the hamburger appears: the mobile sheet
+                   already carries its own "Start free" (and "Sign in"), so this
+                   was a duplicate CTA competing with the burger for the narrow
+                   strip beside the logo and crowding the bar. */
+                className="gsap-h-item group hidden md:inline-flex"
               >
                 Start free
                 {/* Diagonal arrow that exits top-right and re-enters from
