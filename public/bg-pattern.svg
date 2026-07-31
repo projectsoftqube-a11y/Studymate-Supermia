@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!--
+    Page background texture — a 64px tile that repeats seamlessly.
+
+    Drawn as a faint grid with a slightly stronger dot at each intersection, in
+    the brand's forest hue rather than neutral grey, so the texture reads as part
+    of the palette instead of a generic graph paper. Opacities are deliberately
+    very low: this must register as tone, not as a visible pattern competing with
+    content sitting on top of it.
+
+    Lines sit at the tile edges (0 and 64) so adjacent tiles share them and no
+    seam or double-width line appears where tiles meet.
+  -->
+  <g fill="none" stroke="#0f3d28" stroke-opacity="0.05" stroke-width="1">
+    <path d="M0 0.5H64" />
+    <path d="M0.5 0V64" />
+  </g>
+  <circle cx="0.5" cy="0.5" r="1.1" fill="#0f3d28" fill-opacity="0.07" />
+  <circle cx="32.5" cy="32.5" r="0.9" fill="#0f3d28" fill-opacity="0.045" />
+</svg>

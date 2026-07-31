@@ -1,0 +1,277 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * StudyMate AI Design System
+ * ---------------------------------------------------------------
+ * Premium editorial, story-driven. Apple-quality spacing.
+ * Navy foundation, emerald accent, off-white canvas.
+ * All colors defined as oklch. Change here, not in components.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+
+  /* Deep forest ramp — see :root for the reasoning behind a real ramp. */
+  --color-forest-950: var(--forest-950);
+  --color-forest-900: var(--forest-900);
+  --color-forest-800: var(--forest-800);
+  --color-forest-700: var(--forest-700);
+  --color-forest-600: var(--forest-600);
+  --color-forest-500: var(--forest-500);
+  --color-forest-400: var(--forest-400);
+  --color-forest-300: var(--forest-300);
+
+  /* Mulish carries headings and body; Kalam is a handwritten accent face only.
+     --font-mono keeps its name for Tailwind's `font-mono` utility, but points at
+     Mulish because stats need tabular figures (Kalam has none). */
+  /* Shared page container width. Every section's inner wrapper uses
+     `max-w-site` so the whole page shares one measure. */
+  --container-site: 1520px;
+
+  --font-display: "Mulish", var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Mulish", var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Mulish", var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
+  --font-hand: "Kalam", var(--font-kalam), ui-rounded, cursive;
+
+  --shadow-elegant: 0 30px 80px -40px color-mix(in oklab, var(--primary) 35%, transparent);
+  --shadow-soft: 0 10px 40px -20px color-mix(in oklab, var(--primary) 22%, transparent);
+  --shadow-glow: 0 0 60px -10px color-mix(in oklab, var(--accent) 40%, transparent);
+
+  --gradient-hero: radial-gradient(1200px 600px at 80% 20%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 60%),
+                   radial-gradient(800px 500px at 20% 80%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 60%);
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 70%, var(--primary)) 100%);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Font family handles. Kept as separate vars so a font loader (next/font,
+     fontsource, or a self-hosted @font-face) can override them without
+     touching the --font-* tokens above. */
+  --font-kalam: "Kalam", cursive;
+  --font-mulish: "Mulish", sans-serif;
+
+  /* Canvas */
+  --background: oklch(0.985 0.006 95);          /* #FAFAF7 off-white */
+  --surface: oklch(1 0 0);                       /* pure white cards */
+  --foreground: oklch(0.19 0.02 265);            /* #111827 charcoal */
+  --ink: oklch(0.19 0.02 265);
+  --ink-muted: oklch(0.48 0.02 260);
+
+  /* Primary — deep navy #0F172A */
+  --primary: oklch(0.22 0.04 265);
+  --primary-foreground: oklch(0.985 0.006 95);
+
+  /* Accent — emerald #16A34A */
+  --accent: oklch(0.62 0.17 148);
+  --accent-foreground: oklch(0.985 0.006 95);
+  --accent-soft: oklch(0.94 0.05 148);
+
+  --secondary: oklch(0.96 0.005 260);
+  --secondary-foreground: oklch(0.22 0.04 265);
+
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.48 0.02 260);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.02 265);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.02 265);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0.006 95);
+
+  --border: oklch(0.9 0.008 260);
+  --input: oklch(0.9 0.008 260);
+  --ring: oklch(0.62 0.17 148);
+
+  /* -------- Deep forest scale --------
+     The brand's dark-green family, used for buttons, the header capsule and any
+     surface that needs to read as "deep green" rather than navy. Kept as a real
+     ramp (not opacity steps on --accent) so gradients between the stops stay in
+     the same hue family instead of washing toward grey. */
+  --forest-950: oklch(0.24 0.055 158);   /* deepest — button base, near-black green */
+  --forest-900: oklch(0.30 0.070 158);
+  --forest-800: oklch(0.36 0.085 155);
+  --forest-700: oklch(0.43 0.105 152);
+  --forest-600: oklch(0.52 0.135 150);
+  --forest-500: oklch(0.62 0.170 148);   /* == --accent, the emerald pivot */
+  --forest-400: oklch(0.71 0.165 148);   /* highlight / glow */
+  --forest-300: oklch(0.81 0.120 148);
+
+  /* Flat wash under the body texture tile. The reference uses a neutral
+     #f4f4f4; this is the same lightness carried a few degrees toward the
+     canvas hue so the page does not read cool grey next to the forest palette. */
+  --page-wash: oklch(0.958 0.004 120);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    /* No `scroll-behavior: smooth` here — Lenis animates scrolling itself, and
+       the native implementation fights it on anchor jumps (both animate the same
+       scroll position, so the page stutters). Lenis re-adds the behaviour, and
+       the reduced-motion block below restores `auto` when Lenis stays off. */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+
+    /* Nothing may scroll the page sideways. Several sections use decorative
+       blurs and translated glows that are deliberately wider than the viewport;
+       without this they add horizontal scroll on narrow screens, which reads as
+       a broken layout even though the content itself fits.
+
+       `overflow-x: clip` rather than `hidden`: `hidden` on the root makes the
+       element a scroll container, and that silently cancels `position: sticky`
+       on descendants — the stacking cards in the Problem section depend on it. */
+    overflow-x: clip;
+  }
+
+  /* The page's minimum supported width. Below this, let the viewport scroll
+     rather than crushing the layout into an unreadable column. */
+  body {
+    min-width: 320px;
+  }
+
+  body {
+    /* Two stacked layers, in paint order: the repeating texture tile on top of a
+       flat base wash. The gradient is a solid-to-solid pair rather than a plain
+       background-color because the tile needs something opaque beneath it that
+       still participates in `background-image` layering.
+
+       The tile is served from /public rather than hotlinked from a CDN: a
+       third-party asset can 403 or vanish without warning, and this one is
+       ~400 bytes. */
+    background-image: url("/bg-pattern.svg"),
+                      linear-gradient(var(--page-wash), var(--page-wash));
+    background-repeat: repeat, no-repeat;
+    /* Fixed so the texture stays put while content scrolls over it — a
+       repeating tile that scrolls with the page reads as visual noise. */
+    background-attachment: fixed, fixed;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    /* Mulish is slightly wider than Manrope, so ease off the negative tracking. */
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+
+  /* Stats, counters, percentages — tabular figures keep columns from jittering. */
+  .font-numeric {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Anything clickable shows the hand cursor.
+     Browsers give <button> the default arrow, and an <a> only gets the hand
+     when it actually has an href, so without this the quiz answers, the FAQ
+     rows, the step tabs and the mobile menu toggle all read as static text.
+     Set in the base layer rather than on each component so it also covers
+     controls added later. */
+  button,
+  [role="button"],
+  a[href],
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+
+  /* Withdraw the affordance when the control cannot be used, rather than
+     leaving a hand cursor over something that will not respond. */
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  [disabled] {
+    cursor: not-allowed;
+  }
+}
+
+/* -------- Typography accents -------- */
+
+/*
+ * Handwritten accent (Kalam). Use sparingly — short annotations, margin notes,
+ * "teacher's pen" callouts. Never for body copy or long headings: Kalam has no
+ * tabular figures and legibility drops at large sizes.
+ */
+@utility font-hand {
+  font-family: var(--font-hand);
+  letter-spacing: 0;
+}
+
+/* -------- Motion primitives (respect reduced motion) -------- */
+@utility animate-float {
+  animation: sm-float 6s ease-in-out infinite;
+}
+@utility animate-float-slow {
+  animation: sm-float 9s ease-in-out infinite;
+}
+@utility animate-fade-up {
+  animation: sm-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@utility animate-pulse-ring {
+  animation: sm-pulse-ring 2.6s ease-out infinite;
+}
+
+@keyframes sm-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes sm-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sm-pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent); }
+  70% { box-shadow: 0 0 0 22px color-mix(in oklab, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

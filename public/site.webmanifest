@@ -1,0 +1,29 @@
+{
+  "name": "StudyMate AI: Your Personal AI Study Companion",
+  "short_name": "StudyMate",
+  "description": "An AI tutor that answers from your own textbooks. Chat through any chapter, practise at your level, and see exactly what to study next.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbfaf6",
+  "theme_color": "#012715",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
