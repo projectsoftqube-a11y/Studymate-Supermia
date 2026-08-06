@@ -10,6 +10,7 @@ import AnalyticsSection from "@/components/sections/AnalyticsSection";
 import ChatTextbookSection from "@/components/sections/ChatTextbookSection";
 import AdaptiveSection from "@/components/sections/AdaptiveSection";
 import FAQSection from "@/components/sections/FAQSection";
+import BrochureSection from "@/components/sections/BrochureSection";
 import ClosingCTASection from "@/components/sections/ClosingCTASection";
 import Footer from "@/components/sections/Footer";
 
@@ -73,6 +74,12 @@ function Index() {
           it and clicking is where unspoken doubts surface. These answer them,
           and carry the page's FAQPage structured data. */}
       <FAQSection />
+      {/* Penultimate: by here the objections are answered, but the reader is
+          often not the person who decides — a student shows a parent, a teacher
+          shows a head of department. This hands them the brochure to take away,
+          and deliberately does not ask for the signup, so it does not compete
+          with the close immediately below it. */}
+      <BrochureSection />
       {/* The close. Carries `id="start"`, so every "Start free" button on the
           page scrolls here rather than to a dead anchor. */}
       <ClosingCTASection />
