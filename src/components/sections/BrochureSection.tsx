@@ -115,13 +115,21 @@ export default function BrochureSection() {
             { y: 34, opacity: 0, rotate: -3 },
             { y: 0, opacity: 1, rotate: -2.5, duration: 0.95, ease: "expo.out" },
             0.2,
+          )
+          /* The mascot walks in from the left edge, last and slowest, so it
+             reads as arriving into the margin rather than as part of the copy. */
+          .fromTo(
+            ".br-mascot",
+            { x: -38, y: 20, opacity: 0 },
+            { x: 0, y: 0, opacity: 1, duration: 1.1, ease: "expo.out" },
+            0.34,
           );
 
         return () => heading.revert();
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(".br-eyebrow, .br-heading, .br-sub, .br-cta, .br-spec, .br-cover", {
+        gsap.set(".br-eyebrow, .br-heading, .br-sub, .br-cta, .br-spec, .br-cover, .br-mascot", {
           clearProps: "all",
           opacity: 1,
         });
@@ -147,6 +155,52 @@ export default function BrochureSection() {
             WebkitMaskImage:
               "radial-gradient(ellipse 75% 70% at 50% 40%, #000 20%, transparent 100%)",
             maskImage: "radial-gradient(ellipse 75% 70% at 50% 40%, #000 20%, transparent 100%)",
+          }}
+        />
+
+        {/* ---------- mascot ----------
+            Flush against the panel's left edge and standing on its floor, so the
+            character reads as leaning into the section rather than floating in
+            it. `bottom-0 left-0` with no inset is what "touching" means here —
+            the panel's own `overflow-clip` trims it to the rounded corner.
+
+            The content column stays CENTRED — it is not shifted right to make
+            room. An earlier version padded the column across to clear this
+            figure, which pushed the cover and copy off-centre and left an
+            obvious dead gap on the left; the section read as misaligned rather
+            than as decorated.
+
+            So the figure lives entirely in the margin the centred column already
+            leaves, and its width is tied to how much margin actually exists:
+            max-w-5xl inside the panel leaves ~9.8rem clear at 1280, ~17.8rem at
+            1536 and ~29.8rem at 1920. The widths below stay inside those
+            numbers, so it never reaches the cover mock at any size.
+
+            `2xl:block`, hidden below. At xl the margin is only ~9.8rem, which is
+            too narrow to hold this full-length standing figure at a size where
+            it reads as anything but a sliver. On a phone there is no margin at
+            all, and a decorative 2.5 MB render is not worth the bandwidth on the
+            screen least able to afford it. */}
+        <img
+          src="/maskot-2.png"
+          alt=""
+          aria-hidden
+          loading="lazy"
+          decoding="async"
+          width={1024}
+          height={1536}
+          className="br-mascot pointer-events-none absolute bottom-0 left-0 hidden h-auto w-[15rem] select-none 2xl:block min-[1728px]:w-[19rem]"
+          style={{
+            /* Corners are already alpha 0 (the render is ~73% transparent), so
+               no cutout is needed. This only feathers the two inner edges where
+               the figure meets the content column, so it dissolves into the
+               panel instead of ending on a straight cut. */
+            WebkitMaskImage:
+              "linear-gradient(to top, #000 78%, transparent 100%), linear-gradient(to right, #000 76%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to top, #000 78%, transparent 100%), linear-gradient(to right, #000 76%, transparent 100%)",
+            WebkitMaskComposite: "source-in",
+            maskComposite: "intersect",
           }}
         />
 

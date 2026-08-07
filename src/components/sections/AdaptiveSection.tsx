@@ -358,6 +358,14 @@ export default function AdaptiveSection() {
             { x: -20, opacity: 0 },
             { x: 0, opacity: 1, duration: 0.5, stagger: { each: 0.08, from: "end" } },
             0.5,
+          )
+          /* The mascot rises into the corner last and slowest, so it reads as
+             settling into the margin rather than as part of the quiz panel. */
+          .fromTo(
+            ".ad-mascot",
+            { y: 46, opacity: 0 },
+            { y: 0, opacity: 1, duration: 1.1, ease: "expo.out" },
+            0.42,
           );
       });
 
@@ -366,7 +374,7 @@ export default function AdaptiveSection() {
            in the dependency-driven hooks below, outside this matchMedia. Those
            hooks are NOT gated on reduced motion, so without resetting them here
            the quiz body and question card could be left at opacity 0. */
-        gsap.set(".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card", {
+        gsap.set(".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card, .ad-mascot", {
           clearProps: "all",
           opacity: 1,
         });
@@ -390,7 +398,7 @@ export default function AdaptiveSection() {
 
       root
         .querySelectorAll<HTMLElement>(
-          ".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card",
+          ".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card, .ad-mascot",
         )
         .forEach((el) => {
           if (Number(getComputedStyle(el).opacity) < 0.99) {
@@ -456,7 +464,14 @@ export default function AdaptiveSection() {
   );
 
   return (
-    <section ref={rootRef} id="adaptive" className="relative isolate z-30 py-24 sm:py-32">
+    /* `overflow-clip` is what keeps the mascot below inside this section: it is
+       positioned against the section box and would otherwise spill over the
+       sections either side of it. */
+    <section
+      ref={rootRef}
+      id="adaptive"
+      className="relative isolate z-30 overflow-clip py-24 sm:py-32"
+    >
       <div className="mx-auto max-w-site px-4 sm:px-6 lg:px-10">
         {/* ---------- heading ---------- */}
         <div className="mx-auto max-w-3xl text-center">
@@ -806,6 +821,46 @@ export default function AdaptiveSection() {
           </div>
         </div>
       </div>
+
+      {/* ---------- mascot ----------
+          Fills the empty right-hand gutter the centred quiz panel leaves behind.
+          The panel is capped at max-w-4xl inside a max-w-site band, so on a wide
+          screen everything from the panel edge outward sat blank — this puts the
+          brand's character in it rather than widening a measure that is
+          deliberately narrow.
+
+          Anchored to the SECTION, not the panel: it is decoration sitting in the
+          margin, so it hangs off the section's bottom-right corner and lets the
+          quiz keep its own centred alignment.
+
+          `xl:block`, hidden below. Between lg and xl the gutter is too narrow to
+          hold it without crowding the panel, and on a phone there is no gutter at
+          all — a decorative 2.7 MB render is not worth a horizontal squeeze or
+          the bandwidth on the screen least able to afford it. */}
+      <img
+        src="/maskot-1.png"
+        alt=""
+        aria-hidden
+        /* `loading="lazy"` + `decoding="async"`: this sits far down the page and
+           is purely decorative, so it must not compete with the fonts, the hero
+           video or the sections above it for bandwidth on first paint. */
+        loading="lazy"
+        decoding="async"
+        className="ad-mascot pointer-events-none absolute -bottom-10 right-0 hidden h-auto w-60 select-none xl:block 2xl:w-70"
+        style={{
+          /* The PNG's corners are already transparent (alpha 0) and its amber
+             glow fades out through the alpha channel, so it needs no cutout. The
+             mask only softens the two inner edges where the render meets the
+             quiz panel, so the character dissolves into the page rather than
+             ending on a straight cut. */
+          WebkitMaskImage:
+            "linear-gradient(to top, #000 72%, transparent 100%), linear-gradient(to left, #000 78%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to top, #000 72%, transparent 100%), linear-gradient(to left, #000 78%, transparent 100%)",
+          WebkitMaskComposite: "source-in",
+          maskComposite: "intersect",
+        }}
+      />
     </section>
   );
 }
