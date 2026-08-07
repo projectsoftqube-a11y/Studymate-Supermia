@@ -846,19 +846,31 @@ export default function AdaptiveSection() {
            video or the sections above it for bandwidth on first paint. */
         loading="lazy"
         decoding="async"
-        className="ad-mascot pointer-events-none absolute -bottom-10 right-0 hidden h-auto w-60 select-none xl:block 2xl:w-70"
+        width={1024}
+        height={1536}
+        className="ad-mascot pointer-events-none absolute bottom-0 right-0 hidden h-auto w-60 select-none xl:block 2xl:w-70"
         style={{
-          /* The PNG's corners are already transparent (alpha 0) and its amber
-             glow fades out through the alpha channel, so it needs no cutout. The
-             mask only softens the two inner edges where the render meets the
-             quiz panel, so the character dissolves into the page rather than
-             ending on a straight cut. */
-          WebkitMaskImage:
-            "linear-gradient(to top, #000 72%, transparent 100%), linear-gradient(to left, #000 78%, transparent 100%)",
-          maskImage:
-            "linear-gradient(to top, #000 72%, transparent 100%), linear-gradient(to left, #000 78%, transparent 100%)",
-          WebkitMaskComposite: "source-in",
-          maskComposite: "intersect",
+          /* ONE gradient, and no `mask-composite`.
+             This previously used two gradient layers combined with
+             `-webkit-mask-composite: source-in` + `mask-composite: intersect`,
+             which made the whole image invisible in the browser.
+
+             Two reasons, and either alone is fatal:
+
+             1. The two properties take DIFFERENT keyword sets — the standard one
+                accepts add/subtract/intersect/exclude, the -webkit- one accepts
+                source-in/xor/etc. They are not the same property spelled two
+                ways, so they cannot be set to "equivalent" values.
+             2. `source-in` composites each mask layer against what is already
+                beneath it. The FIRST layer has nothing beneath it, so the
+                intersection is empty and the element masks out to nothing.
+
+             The PNG's corners are already transparent (alpha 0) and its amber
+             glow fades through the alpha channel, so one soft bottom fade is all
+             that was ever needed. A single mask layer needs no compositing at
+             all, which is why this cannot regress the same way. */
+          WebkitMaskImage: "linear-gradient(to top, #000 82%, transparent 100%)",
+          maskImage: "linear-gradient(to top, #000 82%, transparent 100%)",
         }}
       />
     </section>

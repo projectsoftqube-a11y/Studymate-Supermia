@@ -1,11 +1,12 @@
 import { useRef } from "react";
-import { ArrowDownToLine, BookOpenCheck, FileText, Share2 } from "lucide-react";
+import { ArrowDownToLine, ArrowUpRight, BookOpenCheck, FileText, Share2 } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { refreshAfterFonts } from "@/lib/scroll-refresh";
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { EXTERNAL_LINK_PROPS } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 
@@ -42,7 +43,10 @@ const BROCHURE_FILENAME = "StudyMate-Brochure.pdf";
 const SPECS = [
   { Icon: FileText, label: "8 pages" },
   { Icon: ArrowDownToLine, label: "PDF · 5.2 MB" },
-  { Icon: Share2, label: "Share with a parent" },
+  /* "Share with a parent" described the download button's purpose, which now has
+     a sibling that does something different. This states a property of the file
+     instead, so the row stays a spec list rather than a caption for one button. */
+  { Icon: Share2, label: "No signup to read it" },
 ] as const;
 
 /**
@@ -191,16 +195,17 @@ export default function BrochureSection() {
           height={1536}
           className="br-mascot pointer-events-none absolute bottom-0 left-0 hidden h-auto w-[15rem] select-none 2xl:block min-[1728px]:w-[19rem]"
           style={{
-            /* Corners are already alpha 0 (the render is ~73% transparent), so
-               no cutout is needed. This only feathers the two inner edges where
-               the figure meets the content column, so it dissolves into the
-               panel instead of ending on a straight cut. */
-            WebkitMaskImage:
-              "linear-gradient(to top, #000 78%, transparent 100%), linear-gradient(to right, #000 76%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to top, #000 78%, transparent 100%), linear-gradient(to right, #000 76%, transparent 100%)",
-            WebkitMaskComposite: "source-in",
-            maskComposite: "intersect",
+            /* ONE gradient, and no `mask-composite` — see the matching note in
+               AdaptiveSection. Two mask layers combined with
+               `-webkit-mask-composite: source-in` render the element completely
+               invisible: the two composite properties take different keyword
+               sets, and `source-in` on the first layer composites against an
+               empty backdrop, so nothing survives.
+
+               The corners are already alpha 0 (this render is ~73% transparent),
+               so a single soft bottom fade is all it ever needed. */
+            WebkitMaskImage: "linear-gradient(to top, #000 82%, transparent 100%)",
+            maskImage: "linear-gradient(to top, #000 82%, transparent 100%)",
           }}
         />
 
@@ -300,7 +305,15 @@ export default function BrochureSection() {
                 meeting, without asking anyone to scroll a website first.
               </p>
 
-              <div className="br-cta mt-8 flex justify-center lg:justify-start">
+              {/* Two ways to take it, because they suit different readers. The
+                  download is for the person who wants to keep or forward the
+                  file; opening it in a tab is for the person who just wants to
+                  look now and would rather not commit 5 MB to their downloads
+                  folder to find out whether it is worth reading.
+
+                  `flex-col` below sm: side by side, two lg buttons overflow a
+                  narrow phone and the second wraps awkwardly under the first. */}
+              <div className="br-cta mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
                 {/* `download`, not a plain link. Without it the browser opens the
                     PDF in its built-in viewer, which on mobile means leaving the
                     page entirely with no reliable way back. The attribute value
@@ -325,6 +338,37 @@ export default function BrochureSection() {
                   <span className="relative grid h-5 w-5 place-items-center overflow-hidden">
                     <ArrowDownToLine className="h-5 w-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-5" />
                     <ArrowDownToLine className="absolute h-5 w-5 -translate-y-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+                  </span>
+                </MagneticButton>
+
+                {/* Read it here instead. No `download` attribute, so the browser
+                    renders the PDF in its own viewer rather than saving it.
+
+                    `target="_blank"` IS correct on this one, unlike the download
+                    beside it: this genuinely navigates, and opening in a new tab
+                    means the reader still has the landing page waiting when they
+                    close the viewer. EXTERNAL_LINK_PROPS carries the matching
+                    `rel="noopener"`.
+
+                    `outline`, not a second `ink` face — the download is the
+                    primary of the two, and two identical capsules would make the
+                    reader choose rather than act. */}
+                <MagneticButton
+                  as="a"
+                  href={BROCHURE_PDF}
+                  {...EXTERNAL_LINK_PROPS}
+                  variant="outline"
+                  size="lg"
+                  roll={false}
+                  className="group"
+                >
+                  View in browser
+                  {/* Diagonal arrow, the page's established "opens elsewhere"
+                      cue — it matches the hero CTA and separates this visually
+                      from the download's vertical arrow. */}
+                  <span className="relative grid h-5 w-5 place-items-center overflow-hidden">
+                    <ArrowUpRight className="h-5 w-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-5 group-hover:-translate-y-5" />
+                    <ArrowUpRight className="absolute h-5 w-5 -translate-x-5 translate-y-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:translate-y-0" />
                   </span>
                 </MagneticButton>
               </div>
