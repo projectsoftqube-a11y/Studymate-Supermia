@@ -1,0 +1,17 @@
+# Line endings are decided here, not by each clone's local Git config.
+#
+# Windows clones default to `core.autocrlf=true`, which checks files out with
+# CRLF. Two things in this project disagree with that:
+#
+#   1. `src/routeTree.gen.ts` is rewritten with LF by the TanStack Router vite
+#      plugin every time the dev server picks up a route change. Against a CRLF
+#      working tree that file reads as permanently modified in `git status` even
+#      when its content is byte-for-byte identical to the commit — a change that
+#      cannot be committed away, because regenerating it recreates it.
+#   2. Prettier is configured for LF, so a CRLF working copy fails `npm run lint`
+#      with a `Delete ␍` error on literally every line of every file.
+#
+# `eol=lf` pins the working tree to LF whatever `core.autocrlf` says, which fixes
+# both. `text=auto` still lets Git detect and leave binary files alone, so the
+# PNGs, the PDF and the video under /public are unaffected.
+* text=auto eol=lf
