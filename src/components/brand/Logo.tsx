@@ -100,14 +100,20 @@ export function LogoLink({
     <a
       href="/"
       aria-label="StudyMate AI home"
-      /* Scroll to top rather than navigate.
-         The whole site is one route, so `href="/"` reloaded the entire document:
-         it lost the smooth-scroll instance, replayed every entrance animation
-         and re-fetched the hero video. `preventDefault` keeps the anchor
-         semantics (real href, so middle-click and "open in new tab" still work)
-         while turning a plain left-click into a scroll. */
+      /* Scroll to top rather than navigate — but only when already home.
+         The marketing site is one route, so there `href="/"` reloaded the entire
+         document: it lost the smooth-scroll instance, replayed every entrance
+         animation and re-fetched the hero video. `preventDefault` keeps the
+         anchor semantics (real href, so middle-click and "open in new tab" still
+         work) while turning a plain left-click into a scroll.
+
+         On /privacy and /terms the same interception would make the logo a
+         control that scrolls a legal page upward and never leaves it, which is
+         the one thing a brand mark in a header must not do. There the click
+         falls through to the browser and navigates home. */
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        if (window.location.pathname !== "/") return;
         e.preventDefault();
         scrollToTop();
 

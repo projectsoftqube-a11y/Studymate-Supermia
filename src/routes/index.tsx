@@ -13,8 +13,19 @@ import FAQSection from "@/components/sections/FAQSection";
 import BrochureSection from "@/components/sections/BrochureSection";
 import ClosingCTASection from "@/components/sections/ClosingCTASection";
 import Footer from "@/components/sections/Footer";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
+  /* Canonical only. Every other tag this page needs is already correct on the
+     root route, which is written for the homepage.
+     Vercel serves this deployment on several hostnames (the project domain plus
+     a per-commit preview URL for every push), and without this each one is a
+     separate indexable copy competing with the others. It sits here rather than
+     in the root shell because `links` are concatenated across matched routes,
+     so a root-level canonical would also stamp itself on /privacy and /terms. */
+  head: () => ({
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+  }),
   component: Index,
 });
 

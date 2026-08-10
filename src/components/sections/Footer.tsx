@@ -1,3 +1,4 @@
+import { useRouterState } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Globe, Mail, MapPin } from "lucide-react";
 import { LogoLink } from "@/components/brand/Logo";
 import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
@@ -11,15 +12,24 @@ import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
  * them into nothing. These all resolve to sections that exist on this page.
  */
 const EXPLORE = [
-  { label: "Why StudyMate", href: "#problem" },
-  { label: "How it works", href: "#how" },
-  { label: "Your progress", href: "#analytics" },
+  { label: "Why StudyMate", id: "problem" },
+  { label: "How it works", id: "how" },
+  { label: "Your progress", id: "analytics" },
 ] as const;
 
 const TRY = [
-  { label: "Ask the book", href: "#chat" },
-  { label: "Try a test", href: "#adaptive" },
-  { label: "Questions", href: "#faq" },
+  { label: "Ask the book", id: "chat" },
+  { label: "Try a test", id: "adaptive" },
+  { label: "Questions", id: "faq" },
+] as const;
+
+/**
+ * The legal pages. Real routes, not anchors, so they sit in the base bar
+ * alongside the copyright rather than in the section columns above.
+ */
+const LEGAL = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms & Conditions", href: "/terms" },
 ] as const;
 
 /**
@@ -65,35 +75,45 @@ export default function Footer() {
      from the page, and the `.ft-card` / `.ft-col` / `.ft-base` classes are kept
      only as markup hooks. */
 
+  /* The footer is mounted on the legal routes as well, where none of these
+     sections exist, so off the homepage every anchor is rewritten to `/#id` and
+     navigates home first. Same reasoning as SiteHeader: on `/` they stay bare so
+     Lenis's delegated handler keeps claiming them. */
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onHome = pathname === "/";
+
   /* One renderer for both link groups: they differ only in heading and items. */
-  const linkGroup = (heading: string, items: readonly { label: string; href: string }[]) => (
+  const linkGroup = (heading: string, items: readonly { label: string; id: string }[]) => (
     <div className="ft-col">
       <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-forest-700">
         {heading}
       </h2>
       <ul className="mt-5 space-y-3">
-        {items.map(({ label, href }) => (
-          <li key={href}>
-            <a
-              href={href}
-              className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
-            >
-              <span className="relative">
-                {label}
-                {/* Underline drawn from the left on hover, rather than a rule
-                    that is always half-visible. */}
-                <span
+        {items.map(({ label, id }) => {
+          const href = onHome ? `#${id}` : `/#${id}`;
+          return (
+            <li key={id}>
+              <a
+                href={href}
+                className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
+              >
+                <span className="relative">
+                  {label}
+                  {/* Underline drawn from the left on hover, rather than a rule
+                      that is always half-visible. */}
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-0.5 left-0 h-px w-0 bg-forest-500 transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  />
+                </span>
+                <ArrowRight
                   aria-hidden
-                  className="absolute -bottom-0.5 left-0 h-px w-0 bg-forest-500 transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="h-3.5 w-3.5 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
                 />
-              </span>
-              <ArrowRight
-                aria-hidden
-                className="h-3.5 w-3.5 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-              />
-            </a>
-          </li>
-        ))}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -232,9 +252,35 @@ export default function Footer() {
 
       {/* ---- legal ---- */}
       <div className="relative mx-auto max-w-site px-4 sm:px-6 lg:px-10">
-        <div className="ft-base flex flex-col gap-3 border-t border-forest-950/[0.09] py-7 text-[13px] text-forest-950/70 sm:flex-row sm:items-center sm:justify-between">
+        <div className="ft-base flex flex-col gap-4 border-t border-forest-950/[0.09] py-7 text-[13px] text-forest-950/70 lg:flex-row lg:items-center lg:justify-between">
           <p>© {new Date().getFullYear()} StudyMate AI. All rights reserved.</p>
-          <p className="text-forest-950/70">by <a href="https://supermia.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950 font-bold">SuperMIA</a> · <a href="https://botfinity.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950">Botfinity Inc.</a></p>
+
+          {/* Legal + attribution share the right-hand end. They wrap onto their
+              own lines below `lg`, where the copyright and the two policy links
+              together are wider than the column. */}
+          <div className="flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-center">
+            <nav aria-label="Legal" className="flex items-center gap-x-5">
+              {LEGAL.map(({ label, href }) => (
+                <a
+                  key={href}
+                  href={href}
+                  /* `aria-current="page"` rather than a colour-only cue: on the
+                     document you are already reading, the link stays clickable
+                     and needs to announce that it goes nowhere new. */
+                  aria-current={pathname === href ? "page" : undefined}
+                  className={`font-semibold transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
+                    pathname === href ? "text-forest-950" : "text-forest-950/70"
+                  }`}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <span aria-hidden className="hidden h-3.5 w-px bg-forest-950/15 sm:block" />
+
+            <p className="text-forest-950/70">by <a href="https://supermia.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950 font-bold">SuperMIA</a> · <a href="https://botfinity.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950">Botfinity Inc.</a></p>
+          </div>
         </div>
       </div>
     </footer>

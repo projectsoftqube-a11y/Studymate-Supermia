@@ -217,10 +217,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      /* Canonical. Vercel serves this deployment on several hostnames (the
-         project domain plus per-commit preview URLs), and without this each one
-         is a separate indexable copy competing with the others. */
-      { rel: "canonical", href: `${SITE_URL}/` },
+      /* No canonical here, deliberately.
+         `links` from the root and the matched route are concatenated rather than
+         deduped by `rel`, so a canonical declared at this level would render on
+         every page alongside the route's own and point /privacy and /terms back
+         at the homepage. Each route declares its own instead — see
+         `routes/index.tsx` for the reasoning about preview hostnames. */
       /* Icons. PNGs at explicit sizes first so a browser picks the right one
          without downscaling, then the multi-res .ico as the universal fallback
          (which browsers request at /favicon.ico regardless of markup anyway).
