@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://study-mate-ai-new.vercel.app/sitemap.xml
+Sitemap: https://studymate.supermia.ai/sitemap.xml

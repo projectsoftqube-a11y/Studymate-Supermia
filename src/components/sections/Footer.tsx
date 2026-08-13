@@ -1,27 +1,40 @@
 import { useRouterState } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Globe, Mail, MapPin } from "lucide-react";
 import { LogoLink } from "@/components/brand/Logo";
-import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
+import { APP_URL, EXTERNAL_LINK_PROPS, MAIN_SITE_URL } from "@/lib/site";
 
 /**
- * On-page anchors only.
+ * Real destinations only.
  *
  * The previous footer carried twenty-one links across four columns, every one
  * pointing at "#". A footer full of dead links is worse than a small one: it
  * costs the reader a click to learn the link was fake, and search engines follow
- * them into nothing. These all resolve to sections that exist on this page.
+ * them into nothing. Every entry below resolves to something that exists —
+ * either a section of the marketing page or a live external page.
+ *
+ * A link is one or the other, never both: `id` is an on-page section, resolved
+ * against the current route; `href` is an outright destination.
  */
-const EXPLORE = [
+type FooterLink =
+  { label: string; id: string; href?: never } | { label: string; href: string; id?: never };
+
+const EXPLORE: readonly FooterLink[] = [
   { label: "Why StudyMate", id: "problem" },
   { label: "How it works", id: "how" },
   { label: "Your progress", id: "analytics" },
-] as const;
+  /* The one link back to the parent brand's own page for this product. It sits
+     in Explore rather than the contact column because it is something to read,
+     not a way to get in touch, and it is the first link to that URL in document
+     order — which is the one whose anchor text search engines actually count
+     when a page links to the same target twice (the sign-off below is second). */
+  { label: "About StudyMate on SuperMIA", href: MAIN_SITE_URL },
+];
 
-const TRY = [
+const TRY: readonly FooterLink[] = [
   { label: "Ask the book", id: "chat" },
   { label: "Try a test", id: "adaptive" },
   { label: "Questions", id: "faq" },
-] as const;
+];
 
 /**
  * The legal pages. Real routes, not anchors, so they sit in the base bar
@@ -83,22 +96,31 @@ export default function Footer() {
   const onHome = pathname === "/";
 
   /* One renderer for both link groups: they differ only in heading and items. */
-  const linkGroup = (heading: string, items: readonly { label: string; id: string }[]) => (
+  const linkGroup = (heading: string, items: readonly FooterLink[]) => (
     <div className="ft-col">
       <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-forest-700">
         {heading}
       </h2>
       <ul className="mt-5 space-y-3">
-        {items.map(({ label, id }) => {
-          const href = onHome ? `#${id}` : `/#${id}`;
+        {items.map((item) => {
+          /* An `href` item leaves the site; an `id` item is a section on the
+             marketing page, resolved against the current route. */
+          const isExternal = item.href !== undefined;
+          const href = item.href ?? (onHome ? `#${item.id}` : `/#${item.id}`);
+          /* Diagonal for "this leaves the site", horizontal for "this moves you
+             down the page". The arrow is the only thing distinguishing the two
+             kinds, so it has to actually differ. */
+          const Arrow = isExternal ? ArrowUpRight : ArrowRight;
+
           return (
-            <li key={id}>
+            <li key={href}>
               <a
                 href={href}
-                className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
+                {...(isExternal ? EXTERNAL_LINK_PROPS : {})}
+                className="group inline-flex items-start gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
               >
                 <span className="relative">
-                  {label}
+                  {item.label}
                   {/* Underline drawn from the left on hover, rather than a rule
                       that is always half-visible. */}
                   <span
@@ -106,9 +128,11 @@ export default function Footer() {
                     className="absolute -bottom-0.5 left-0 h-px w-0 bg-forest-500 transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
                   />
                 </span>
-                <ArrowRight
+                {/* `mt-[0.3em]` keeps the arrow on the first line's baseline for
+                    the one label long enough to wrap in a narrow column. */}
+                <Arrow
                   aria-hidden
-                  className="h-3.5 w-3.5 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                  className="mt-[0.3em] h-3.5 w-3.5 shrink-0 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
                 />
               </a>
             </li>
@@ -279,7 +303,31 @@ export default function Footer() {
 
             <span aria-hidden className="hidden h-3.5 w-px bg-forest-950/15 sm:block" />
 
-            <p className="text-forest-950/70">by <a href="https://supermia.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950 font-bold">SuperMIA</a> · <a href="https://botfinity.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950">Botfinity Inc.</a></p>
+            {/* `supermia.ai`, not `supermia.com`. The `.com` is registered to
+                someone else, so this sign-off appeared on every page of the site
+                pointing the brand's own name at a domain the company does not
+                own — a broken destination for readers and leaked authority for
+                search. Botfinity is a genuinely separate company and keeps its
+                own `.com`. */}
+            <p className="text-forest-950/70">
+              by{" "}
+              <a
+                href={MAIN_SITE_URL}
+                {...EXTERNAL_LINK_PROPS}
+                className="font-bold text-forest-950/70 hover:text-forest-950"
+              >
+                SuperMIA
+              </a>{" "}
+              ·{" "}
+              <a
+                href="https://botfinity.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-forest-950/70 hover:text-forest-950"
+              >
+                Botfinity Inc.
+              </a>
+            </p>
           </div>
         </div>
       </div>
