@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  One URL, because the site is genuinely one page. The in-page sections
-  (#problem, #how, #chat, #adaptive, #faq) are fragments of this document, not
-  separate resources, so listing them here would claim pages that do not exist.
+  Three URLs: the marketing page plus the two legal documents, which are real
+  routes with their own canonical tags rather than fragments.
+
+  The in-page sections of the homepage (#problem, #how, #chat, #adaptive, #faq)
+  are deliberately NOT listed. They are fragments of one document, not separate
+  resources, so listing them would claim pages that do not exist.
+
+  Every `loc` must match the `rel="canonical"` the route actually emits — those
+  come from SITE_URL in src/lib/site.ts, and this file is not generated from it.
+  A sitemap advertising a different origin than the canonical tag tells Google
+  the two disagree, and it will pick whichever it trusts more rather than the
+  one intended.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://study-mate-ai-new.vercel.app/</loc>
+    <loc>https://studymate.supermia.ai/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://studymate.supermia.ai/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://studymate.supermia.ai/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

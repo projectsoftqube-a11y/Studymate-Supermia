@@ -1,25 +1,48 @@
+import { useRouterState } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Globe, Mail, MapPin } from "lucide-react";
 import { LogoLink } from "@/components/brand/Logo";
-import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
+import { APP_URL, EXTERNAL_LINK_PROPS, MAIN_SITE_URL } from "@/lib/site";
 
 /**
- * On-page anchors only.
+ * Real destinations only.
  *
  * The previous footer carried twenty-one links across four columns, every one
  * pointing at "#". A footer full of dead links is worse than a small one: it
  * costs the reader a click to learn the link was fake, and search engines follow
- * them into nothing. These all resolve to sections that exist on this page.
+ * them into nothing. Every entry below resolves to something that exists —
+ * either a section of the marketing page or a live external page.
+ *
+ * A link is one or the other, never both: `id` is an on-page section, resolved
+ * against the current route; `href` is an outright destination.
  */
-const EXPLORE = [
-  { label: "Why StudyMate", href: "#problem" },
-  { label: "How it works", href: "#how" },
-  { label: "Your progress", href: "#analytics" },
-] as const;
+type FooterLink =
+  { label: string; id: string; href?: never } | { label: string; href: string; id?: never };
 
-const TRY = [
-  { label: "Ask the book", href: "#chat" },
-  { label: "Try a test", href: "#adaptive" },
-  { label: "Questions", href: "#faq" },
+const EXPLORE: readonly FooterLink[] = [
+  { label: "Why StudyMate", id: "problem" },
+  { label: "How it works", id: "how" },
+  { label: "Your progress", id: "analytics" },
+  /* The one link back to the parent brand's own page for this product. It sits
+     in Explore rather than the contact column because it is something to read,
+     not a way to get in touch, and it is the first link to that URL in document
+     order — which is the one whose anchor text search engines actually count
+     when a page links to the same target twice (the sign-off below is second). */
+  { label: "About StudyMate on SuperMIA", href: MAIN_SITE_URL },
+];
+
+const TRY: readonly FooterLink[] = [
+  { label: "Ask the book", id: "chat" },
+  { label: "Try a test", id: "adaptive" },
+  { label: "Questions", id: "faq" },
+];
+
+/**
+ * The legal pages. Real routes, not anchors, so they sit in the base bar
+ * alongside the copyright rather than in the section columns above.
+ */
+const LEGAL = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms & Conditions", href: "/terms" },
 ] as const;
 
 /**
@@ -65,35 +88,56 @@ export default function Footer() {
      from the page, and the `.ft-card` / `.ft-col` / `.ft-base` classes are kept
      only as markup hooks. */
 
+  /* The footer is mounted on the legal routes as well, where none of these
+     sections exist, so off the homepage every anchor is rewritten to `/#id` and
+     navigates home first. Same reasoning as SiteHeader: on `/` they stay bare so
+     Lenis's delegated handler keeps claiming them. */
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onHome = pathname === "/";
+
   /* One renderer for both link groups: they differ only in heading and items. */
-  const linkGroup = (heading: string, items: readonly { label: string; href: string }[]) => (
+  const linkGroup = (heading: string, items: readonly FooterLink[]) => (
     <div className="ft-col">
       <h2 className="text-[11px] font-bold uppercase tracking-[0.18em] text-forest-700">
         {heading}
       </h2>
       <ul className="mt-5 space-y-3">
-        {items.map(({ label, href }) => (
-          <li key={href}>
-            <a
-              href={href}
-              className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
-            >
-              <span className="relative">
-                {label}
-                {/* Underline drawn from the left on hover, rather than a rule
-                    that is always half-visible. */}
-                <span
+        {items.map((item) => {
+          /* An `href` item leaves the site; an `id` item is a section on the
+             marketing page, resolved against the current route. */
+          const isExternal = item.href !== undefined;
+          const href = item.href ?? (onHome ? `#${item.id}` : `/#${item.id}`);
+          /* Diagonal for "this leaves the site", horizontal for "this moves you
+             down the page". The arrow is the only thing distinguishing the two
+             kinds, so it has to actually differ. */
+          const Arrow = isExternal ? ArrowUpRight : ArrowRight;
+
+          return (
+            <li key={href}>
+              <a
+                href={href}
+                {...(isExternal ? EXTERNAL_LINK_PROPS : {})}
+                className="group inline-flex items-start gap-1.5 text-[14px] font-semibold text-forest-950/65 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500"
+              >
+                <span className="relative">
+                  {item.label}
+                  {/* Underline drawn from the left on hover, rather than a rule
+                      that is always half-visible. */}
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-0.5 left-0 h-px w-0 bg-forest-500 transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  />
+                </span>
+                {/* `mt-[0.3em]` keeps the arrow on the first line's baseline for
+                    the one label long enough to wrap in a narrow column. */}
+                <Arrow
                   aria-hidden
-                  className="absolute -bottom-0.5 left-0 h-px w-0 bg-forest-500 transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="mt-[0.3em] h-3.5 w-3.5 shrink-0 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
                 />
-              </span>
-              <ArrowRight
-                aria-hidden
-                className="h-3.5 w-3.5 -translate-x-1 text-forest-600 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-              />
-            </a>
-          </li>
-        ))}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -232,9 +276,59 @@ export default function Footer() {
 
       {/* ---- legal ---- */}
       <div className="relative mx-auto max-w-site px-4 sm:px-6 lg:px-10">
-        <div className="ft-base flex flex-col gap-3 border-t border-forest-950/[0.09] py-7 text-[13px] text-forest-950/70 sm:flex-row sm:items-center sm:justify-between">
+        <div className="ft-base flex flex-col gap-4 border-t border-forest-950/[0.09] py-7 text-[13px] text-forest-950/70 lg:flex-row lg:items-center lg:justify-between">
           <p>© {new Date().getFullYear()} StudyMate AI. All rights reserved.</p>
-          <p className="text-forest-950/70">by <a href="https://supermia.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950 font-bold">SuperMIA</a> · <a href="https://botfinity.com" target="_blank" rel="noopener noreferrer" className="text-forest-950/70 hover:text-forest-950">Botfinity Inc.</a></p>
+
+          {/* Legal + attribution share the right-hand end. They wrap onto their
+              own lines below `lg`, where the copyright and the two policy links
+              together are wider than the column. */}
+          <div className="flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-center">
+            <nav aria-label="Legal" className="flex items-center gap-x-5">
+              {LEGAL.map(({ label, href }) => (
+                <a
+                  key={href}
+                  href={href}
+                  /* `aria-current="page"` rather than a colour-only cue: on the
+                     document you are already reading, the link stays clickable
+                     and needs to announce that it goes nowhere new. */
+                  aria-current={pathname === href ? "page" : undefined}
+                  className={`font-semibold transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
+                    pathname === href ? "text-forest-950" : "text-forest-950/70"
+                  }`}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <span aria-hidden className="hidden h-3.5 w-px bg-forest-950/15 sm:block" />
+
+            {/* `supermia.ai`, not `supermia.com`. The `.com` is registered to
+                someone else, so this sign-off appeared on every page of the site
+                pointing the brand's own name at a domain the company does not
+                own — a broken destination for readers and leaked authority for
+                search. Botfinity is a genuinely separate company and keeps its
+                own `.com`. */}
+            <p className="text-forest-950/70">
+              by{" "}
+              <a
+                href={MAIN_SITE_URL}
+                {...EXTERNAL_LINK_PROPS}
+                className="font-bold text-forest-950/70 hover:text-forest-950"
+              >
+                SuperMIA
+              </a>{" "}
+              ·{" "}
+              <a
+                href="https://botfinity.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-forest-950/70 hover:text-forest-950"
+              >
+                Botfinity Inc.
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

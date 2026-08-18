@@ -21,6 +21,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -101,6 +102,16 @@ export function SiteHeader() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  /* The header is mounted on the legal routes too, where none of these sections
+     exist. A bare `#how` there is a link that visibly does nothing, so off the
+     homepage the anchors are rewritten to `/#how` and navigate home first.
+     On `/` they stay bare, which keeps them in Lenis's delegated anchor handler
+     (it only claims hrefs starting with `#`) rather than triggering a route
+     change to the page you are already on. */
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const onHome = pathname === "/";
+  const sectionHref = (id: string) => (onHome ? `#${id}` : `/#${id}`);
 
   /* Pill follows hover when there is one, otherwise parks on the in-view
      section. Null on both (top of page) fades it out entirely. */
@@ -298,7 +309,7 @@ export function SiteHeader() {
                     ref={(el) => {
                       linkRefs.current[i] = el;
                     }}
-                    href={`#${item.id}`}
+                    href={sectionHref(item.id)}
                     onMouseEnter={() => setHoverId(item.id)}
                     onFocus={() => setHoverId(item.id)}
                     onBlur={() => setHoverId(null)}
@@ -403,7 +414,7 @@ export function SiteHeader() {
             {NAV.map((item, i) => (
               <a
                 key={item.id}
-                href={`#${item.id}`}
+                href={sectionHref(item.id)}
                 onClick={() => setMobileOpen(false)}
                 style={{ transitionDelay: mobileOpen ? `${90 + i * 50}ms` : "0ms" }}
                 className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-[16px] font-bold tracking-[-0.015em] text-forest-950 transition-all duration-500 active:bg-forest-950/5 ${
