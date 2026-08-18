@@ -332,7 +332,7 @@ export function SiteHeader() {
               <MagneticButton
                 as="a"
                 href={APP_URL}
-              {...EXTERNAL_LINK_PROPS}
+                {...EXTERNAL_LINK_PROPS}
                 variant="ghost"
                 size="sm"
                 /* `md`, not `sm`, to match the CTA beside it and the burger's own
@@ -347,7 +347,7 @@ export function SiteHeader() {
               <MagneticButton
                 as="a"
                 href={APP_URL}
-              {...EXTERNAL_LINK_PROPS}
+                {...EXTERNAL_LINK_PROPS}
                 variant="ink"
                 size="sm"
                 roll={false}

@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/sections/SiteHeader";
 import HeroSection from "@/components/sections/HeroSection";
 import ProblemSection from "@/components/sections/ProblemSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
+import VideoSection from "@/components/sections/VideoSection";
 import AnalyticsSection from "@/components/sections/AnalyticsSection";
 import ChatTextbookSection from "@/components/sections/ChatTextbookSection";
 import AdaptiveSection from "@/components/sections/AdaptiveSection";
@@ -61,6 +62,17 @@ function Index() {
       <HeroSection />
       <ProblemSection />
       <HowItWorksSection />
+      {/* Fourth: the reader now knows what StudyMate is and what starting it
+          involves, and the next honest question is "show me". The four sections
+          below answer that properly, but not every reader will scroll four
+          sections on trust alone — this is the sixty-second version for the ones
+          who want it first. Placed before the long answer rather than after it,
+          where it would only repeat what they had already read.
+
+          Also restores the light/dark rhythm: How It Works and Analytics are
+          both light panels, so a dark section between them keeps the page from
+          running as one continuous white band. */}
+      <VideoSection />
       <AnalyticsSection />
       <ChatTextbookSection />
       {/* Sixth: Chat shows the tutor answering one question, which raises the
