@@ -328,6 +328,20 @@ export default function Footer() {
                 Botfinity Inc.
               </a>
             </p>
+
+            <span aria-hidden className="hidden h-3.5 w-px bg-forest-950/15 sm:block" />
+
+            <p className="text-forest-950/70">
+              Design &amp; Develop by{" "}
+              <a
+                href="https://softqubes.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-forest-950/70 hover:text-forest-950"
+              >
+                Softqube Technologies LLC
+              </a>
+            </p>
           </div>
         </div>
       </div>
