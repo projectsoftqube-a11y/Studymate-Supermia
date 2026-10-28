@@ -34,3 +34,9 @@ dist-ssr
 
 # Source PNGs for generated section art — WebP versions in public/ are what ship.
 _originals/
+
+# env files: every type (.env, .env.local, .env.development, .env.production, .env.example, *.env, .envrc)
+.env
+.env.*
+*.env
+.envrc
