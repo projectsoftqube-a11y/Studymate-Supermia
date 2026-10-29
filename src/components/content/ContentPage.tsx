@@ -201,7 +201,7 @@ function QaList({
       <summary className="relative flex cursor-pointer list-none items-center gap-4 px-5 py-5 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-forest-500 sm:px-6 sm:py-6">
         <span
           aria-hidden
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest-500/10 font-numeric text-[12px] font-extrabold tabular-nums text-forest-700 transition-colors duration-500 group-open:bg-forest-400/15 group-open:text-forest-300"
+          className="hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest-500/10 font-numeric min-[400px]:grid text-[12px] font-extrabold tabular-nums text-forest-700 transition-colors duration-500 group-open:bg-forest-400/15 group-open:text-forest-300"
         >
           {String(n + 1).padStart(2, "0")}
         </span>
@@ -541,7 +541,7 @@ export function Block({
         <p
           className={`max-w-[70ch] ${
             lead
-              ? "text-pretty font-display text-[1.25rem] font-semibold leading-[1.55] tracking-[-0.01em] text-forest-950/85 sm:text-[1.4rem]"
+              ? "text-pretty font-display text-[1.125rem] font-semibold leading-[1.55] tracking-[-0.01em] text-forest-950/85 sm:text-[1.4rem]"
               : dark
                 ? "mt-5 text-[15.5px] leading-[1.8] text-white/70 sm:text-[16.5px] [&_a]:text-forest-300"
                 : `mt-5 ${BODY}`
@@ -618,62 +618,73 @@ export function Block({
       return (
         /* The wrapper scrolls on narrow screens instead of squeezing columns;
            `tabIndex` makes that scroll region reachable by keyboard. */
-        <div
-          tabIndex={0}
-          role="region"
-          aria-label={block.caption}
-          className="mt-10 max-w-full overflow-x-auto rounded-[1.5rem] bg-white ring-1 ring-inset ring-forest-950/[0.08] focus-visible:outline-2 focus-visible:outline-forest-500"
-          style={{
-            boxShadow: "0 1px 2px rgba(16,40,28,0.05), 0 30px 60px -32px rgba(16,40,28,0.35)",
-          }}
-        >
-          <table className="w-full min-w-[34rem] border-collapse text-left text-[14.5px]">
-            <caption className="px-5 pb-4 pt-5 text-left sm:px-6 text-[12px] font-bold uppercase tracking-[0.14em] text-forest-700">
-              {block.caption}
-            </caption>
-            <thead>
-              <tr className="border-b border-forest-950/10 bg-forest-500/[0.07]">
-                {block.head.map((cell, j) => (
-                  <th
-                    key={cell || j}
-                    scope="col"
-                    className={`px-5 py-3.5 font-extrabold ${
-                      highlight && j === 1 ? "bg-forest-950 text-white" : "text-forest-950"
-                    }`}
-                  >
-                    {cell || <span className="sr-only">Feature</span>}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {block.rows.map((row, i) => (
-                <tr
-                  key={i}
-                  className="border-b border-forest-950/[0.07] transition-colors duration-300 last:border-0 hover:bg-forest-500/[0.04]"
-                >
-                  {row.map((cell, j) => {
-                    const Cell = j === 0 ? "th" : "td";
-                    return (
-                      <Cell
-                        key={j}
-                        {...(j === 0 ? { scope: "row" } : {})}
-                        className={`px-5 py-3.5 align-top leading-relaxed ${
-                          j === 0
-                            ? "font-bold text-forest-950"
-                            : highlight && j === 1
-                              ? "bg-forest-500/[0.07] font-semibold text-forest-950"
-                              : "font-normal text-forest-950/70"
-                        }`}
-                      >
-                        <RichText text={cell} />
-                      </Cell>
-                    );
-                  })}
+        <div className="mt-10">
+          {/* The caption, shown above the scroll area so it is never cut off,
+              with a swipe hint on screens where the table scrolls sideways. */}
+          <p
+            aria-hidden
+            className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-1 text-[12px] font-bold uppercase tracking-[0.14em] text-forest-700"
+          >
+            {block.caption}
+            <span className="font-semibold normal-case tracking-normal text-forest-950/45 md:hidden">
+              Swipe to compare →
+            </span>
+          </p>
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label={block.caption}
+            className="max-w-full overflow-x-auto rounded-[1.5rem] bg-white ring-1 ring-inset ring-forest-950/[0.08] focus-visible:outline-2 focus-visible:outline-forest-500"
+            style={{
+              boxShadow: "0 1px 2px rgba(16,40,28,0.05), 0 30px 60px -32px rgba(16,40,28,0.35)",
+            }}
+          >
+            <table className="w-full min-w-[30rem] border-collapse text-left text-[14px] sm:min-w-[34rem] sm:text-[14.5px]">
+              <caption className="sr-only">{block.caption}</caption>
+              <thead>
+                <tr className="border-b border-forest-950/10 bg-forest-500/[0.07]">
+                  {block.head.map((cell, j) => (
+                    <th
+                      key={cell || j}
+                      scope="col"
+                      className={`px-5 py-3.5 font-extrabold ${
+                        highlight && j === 1 ? "bg-forest-950 text-white" : "text-forest-950"
+                      }`}
+                    >
+                      {cell || <span className="sr-only">Feature</span>}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {block.rows.map((row, i) => (
+                  <tr
+                    key={i}
+                    className="border-b border-forest-950/[0.07] transition-colors duration-300 last:border-0 hover:bg-forest-500/[0.04]"
+                  >
+                    {row.map((cell, j) => {
+                      const Cell = j === 0 ? "th" : "td";
+                      return (
+                        <Cell
+                          key={j}
+                          {...(j === 0 ? { scope: "row" } : {})}
+                          className={`px-5 py-3.5 align-top leading-relaxed ${
+                            j === 0
+                              ? "font-bold text-forest-950"
+                              : highlight && j === 1
+                                ? "bg-forest-500/[0.07] font-semibold text-forest-950"
+                                : "font-normal text-forest-950/70"
+                          }`}
+                        >
+                          <RichText text={cell} />
+                        </Cell>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       );
     }
@@ -995,21 +1006,21 @@ export default function ContentPage({ page, content }: { page: SitePage; content
           >
             {/* ---- copy, centred ---- */}
             <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-              <p className="ip-eyebrow inline-flex w-fit items-center gap-2 rounded-full bg-white/80 py-1.5 pl-1.5 pr-4 text-[11px] font-bold uppercase tracking-[0.18em] text-forest-800 ring-1 ring-inset ring-forest-700/15 backdrop-blur-sm">
+              <p className="ip-eyebrow inline-flex w-fit items-center gap-2 rounded-full bg-white/80 py-1.5 pl-1.5 pr-4 text-[11px] font-bold uppercase tracking-[0.12em] text-forest-800 ring-1 sm:tracking-[0.18em] ring-inset ring-forest-700/15 backdrop-blur-sm">
                 <span className="grid h-5 w-5 place-items-center rounded-full bg-forest-950 text-forest-300">
                   <ShieldCheck aria-hidden className="h-3 w-3" strokeWidth={2.5} />
                 </span>
                 {content.eyebrow}
               </p>
 
-              <h1 className="ip-title mt-6 text-balance font-display text-[clamp(2.1rem,5vw,4.1rem)] font-extrabold leading-[1.03] tracking-[-0.045em] text-forest-950">
+              <h1 className="ip-title mt-6 text-balance font-display text-[clamp(1.85rem,5vw,4.1rem)] font-extrabold leading-[1.03] tracking-[-0.045em] text-forest-950">
                 {h1Main}
                 {h1Accent && (
                   <>
                     {" "}
                     {/* Kalam, the brand's handwritten face, on the closing words,
                         as on the homepage headings. */}
-                    <span className="font-hand mt-1 block pr-[0.06em] text-[1.08em] font-bold leading-[1] text-forest-600">
+                    <span className="font-hand mt-1 block pr-[0.06em] text-[0.95em] font-bold leading-[1] text-forest-600 sm:text-[1.08em]">
                       {h1Accent}
                     </span>
                   </>
@@ -1076,7 +1087,7 @@ export default function ContentPage({ page, content }: { page: SitePage; content
                     <dt className="text-[13.5px] font-semibold leading-snug text-forest-950/60">
                       {label}
                     </dt>
-                    <dd className="font-display text-[clamp(1.4rem,2.4vw,2rem)] font-extrabold leading-none tracking-[-0.03em] text-forest-950">
+                    <dd className="font-display text-[clamp(1.2rem,2.4vw,2rem)] font-extrabold leading-none tracking-[-0.03em] text-forest-950">
                       {value}
                     </dd>
                   </div>

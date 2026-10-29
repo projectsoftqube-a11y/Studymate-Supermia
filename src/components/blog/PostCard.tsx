@@ -53,7 +53,7 @@ function GuideCard({ post, Heading }: { post: BlogPost; Heading: "h2" | "h3" }) 
         </span>
         <CoverArt
           post={post}
-          className="absolute bottom-3 right-3 h-[82%] w-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.25)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-105"
+          className="absolute bottom-3 right-3 h-[64%] min-[420px]:h-[82%] w-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.25)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-105"
         />
 
         <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-forest-800 backdrop-blur-sm">
@@ -164,7 +164,7 @@ export default function PostCard({
 
       <div className="relative flex items-center justify-between gap-3">
         <span
-          className={`inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-[11px] font-bold uppercase tracking-[0.16em] ring-1 ring-inset ${
+          className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full py-1 pl-1 pr-3 text-[11px] font-bold uppercase tracking-[0.16em] ring-1 ring-inset ${
             feature
               ? "bg-white/[0.07] text-forest-300 ring-white/10"
               : "bg-forest-500/[0.08] text-forest-700 ring-forest-700/10"
@@ -180,7 +180,7 @@ export default function PostCard({
           {CATEGORIES[post.category].label}
         </span>
         {feature && (
-          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">
+          <span className="hidden whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.18em] text-white/50 min-[400px]:inline">
             Latest guide
           </span>
         )}

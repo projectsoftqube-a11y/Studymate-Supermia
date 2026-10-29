@@ -248,7 +248,7 @@ export default function AnalyticsSection() {
 
         {/* ---------- the dashboard ---------- */}
         <div
-          className="an-board relative mx-auto mt-14 max-w-5xl overflow-hidden rounded-[1.75rem] p-5 ring-1 ring-inset ring-white/10 sm:mt-16 sm:p-7"
+          className="an-board relative mx-auto mt-14 max-w-5xl overflow-hidden rounded-[1.75rem] p-3.5 ring-1 min-[400px]:p-5 ring-inset ring-white/10 sm:mt-16 sm:p-7"
           style={{
             background:
               "radial-gradient(120% 100% at 50% 0%, var(--forest-800), var(--forest-950) 62%)",
@@ -277,7 +277,7 @@ export default function AnalyticsSection() {
                 <span key={c} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c }} />
               ))}
             </span>
-            <span className="mx-auto flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1 text-[11px] font-semibold text-white/50">
+            <span className="mx-auto flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/8 px-3 py-1 text-[11px] font-semibold text-white/50">
               <span className="h-1.5 w-1.5 rounded-full bg-forest-400" />
               Your progress
             </span>
@@ -293,9 +293,9 @@ export default function AnalyticsSection() {
           <div className="relative grid grid-cols-1 gap-5 lg:grid-cols-12">
             {/* ---- ring + counters ---- */}
             <div className="lg:col-span-4">
-              <div className="h-full rounded-[1.25rem] bg-white/4 p-6 ring-1 ring-inset ring-white/8">
-                <div className="flex items-center gap-5">
-                  <div className="relative h-28 w-28 shrink-0">
+              <div className="h-full rounded-[1.25rem] bg-white/4 p-4 ring-1 ring-inset ring-white/8 min-[400px]:p-6">
+                <div className="flex items-center gap-4 min-[400px]:gap-5">
+                  <div className="relative h-24 w-24 shrink-0 min-[400px]:h-28 min-[400px]:w-28">
                     <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
                       <circle
                         cx="60"
@@ -387,7 +387,7 @@ export default function AnalyticsSection() {
 
             {/* ---- trend + chapter breakdown ---- */}
             <div className="lg:col-span-8">
-              <div className="rounded-[1.25rem] bg-white/4 p-6 ring-1 ring-inset ring-white/8">
+              <div className="rounded-[1.25rem] bg-white/4 p-4 ring-1 ring-inset ring-white/8 min-[400px]:p-6">
                 <div className="flex items-baseline justify-between gap-4">
                   <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-forest-300">
                     How you're doing
@@ -487,9 +487,12 @@ export default function AnalyticsSection() {
                     {[...CHAPTERS]
                       .sort((a, b) => a.score - b.score)
                       .map(({ subject, chapter, score: s }, i) => (
-                        <li key={i} className="flex items-center gap-4">
+                        <li
+                          key={i}
+                          className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 sm:flex sm:gap-4"
+                        >
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[13px] font-bold text-white/85">
+                            <span className="block text-[13px] font-bold text-white/85 sm:truncate">
                               {chapter}
                             </span>
                             {/* Subject plus a plain-language verdict. The bar and
@@ -513,7 +516,7 @@ export default function AnalyticsSection() {
                             </span>
                           </span>
 
-                          <span className="h-1.5 w-20 shrink-0 overflow-hidden rounded-full bg-white/8 sm:w-36">
+                          <span className="order-3 col-span-2 h-1.5 w-full shrink-0 overflow-hidden rounded-full bg-white/8 sm:order-none sm:w-36">
                             <span
                               className="an-bar-fill block h-full origin-left rounded-full"
                               style={{

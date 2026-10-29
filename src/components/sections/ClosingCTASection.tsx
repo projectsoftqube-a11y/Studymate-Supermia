@@ -205,7 +205,7 @@ export default function ClosingCTASection() {
 
             <a
               href="mailto:hello@supermia.ai"
-              className="text-[14px] font-bold text-white/70 underline decoration-white/25 underline-offset-4 transition-colors duration-300 hover:text-white hover:decoration-white/60"
+              className="-my-2 inline-block py-2 text-[14px] font-bold text-white/70 underline decoration-white/25 underline-offset-4 transition-colors duration-300 hover:text-white hover:decoration-white/60"
             >
               Email us a question
             </a>

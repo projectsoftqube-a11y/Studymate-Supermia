@@ -330,7 +330,7 @@ export default function BlogListPage() {
               <div
                 role="tablist"
                 aria-label="Guide topics"
-                className="inline-flex max-w-full flex-wrap gap-1.5 rounded-full bg-white p-1.5 ring-1 ring-inset ring-forest-950/[0.08]"
+                className="grid w-full grid-cols-2 gap-1.5 rounded-[1.4rem] bg-white p-1.5 sm:inline-flex sm:w-auto sm:max-w-full sm:flex-wrap sm:rounded-full ring-1 ring-inset ring-forest-950/[0.08]"
                 style={{ boxShadow: "0 12px 30px -22px rgba(16,40,28,0.45)" }}
               >
                 {TABS.map((item) => {
@@ -343,7 +343,7 @@ export default function BlogListPage() {
                       aria-selected={current}
                       aria-controls="guides-panel"
                       onClick={() => pickTab(item.key)}
-                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13.5px] font-bold transition-colors duration-300 ${
+                      className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-[13.5px] font-bold transition-colors duration-300 ${
                         current
                           ? "bg-forest-950 text-white"
                           : "text-forest-950/65 hover:bg-forest-950/[0.05] hover:text-forest-950"

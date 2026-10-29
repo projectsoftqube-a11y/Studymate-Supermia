@@ -293,7 +293,7 @@ export default function VideoSection() {
                   href={WATCH}
                   target="_blank"
                   rel="noopener"
-                  className="text-[13px] font-semibold text-white/60 underline decoration-white/25 underline-offset-4 transition-colors duration-300 hover:text-white hover:decoration-white/60"
+                  className="-my-2 inline-block py-2 text-[13px] font-semibold text-white/60 underline decoration-white/25 underline-offset-4 transition-colors duration-300 hover:text-white hover:decoration-white/60"
                 >
                   Watch on YouTube
                 </a>

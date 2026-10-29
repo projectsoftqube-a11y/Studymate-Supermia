@@ -145,7 +145,7 @@ export default function Footer() {
             <li>
               <a
                 href="mailto:hello@supermia.ai"
-                className="inline-flex items-center gap-2.5 font-semibold text-forest-950/75 transition-colors duration-300 hover:text-forest-950"
+                className="inline-flex items-center gap-2.5 py-1.5 font-semibold sm:py-0 text-forest-950/75 transition-colors duration-300 hover:text-forest-950"
               >
                 <Mail aria-hidden className="h-4 w-4 shrink-0 text-forest-600" />
                 hello@supermia.ai
@@ -170,7 +170,7 @@ export default function Footer() {
             <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-forest-950">
               {heading}
             </p>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-4 space-y-0.5 sm:mt-5 sm:space-y-3">
               {links.map(({ label, href }) => {
                 const external = href.startsWith("http");
                 const current = pathname === href;
@@ -182,7 +182,7 @@ export default function Footer() {
                       /* `aria-current` rather than a colour-only cue, so the
                          link announces that it goes nowhere new. */
                       aria-current={current ? "page" : undefined}
-                      className={`inline-flex items-center gap-1 text-[14px] leading-snug transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
+                      className={`inline-flex items-center gap-1 py-1.5 text-[14px] leading-snug sm:py-0 transition-colors duration-300 hover:text-forest-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
                         current ? "font-bold text-forest-950" : "text-forest-950/65"
                       }`}
                     >

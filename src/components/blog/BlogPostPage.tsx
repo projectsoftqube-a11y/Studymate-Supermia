@@ -159,7 +159,7 @@ export default function BlogPostPage({ post }: { post: BlogPost }) {
               <div className="ip-eyebrow flex flex-wrap items-center gap-3">
                 <a
                   href="/blog"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-bold text-forest-950/50 transition-colors duration-300 hover:text-forest-950"
+                  className="-my-2 inline-flex items-center gap-1.5 py-2 text-[13px] font-bold text-forest-950/50 transition-colors duration-300 hover:text-forest-950"
                 >
                   <ArrowUpRight aria-hidden className="h-3.5 w-3.5 -rotate-[135deg]" />
                   All guides
@@ -265,7 +265,7 @@ export default function BlogPostPage({ post }: { post: BlogPost }) {
           {/* ---- article ---- */}
           <article
             ref={articleRef}
-            className="rounded-[1.75rem] bg-white px-5 py-8 ring-1 ring-inset ring-forest-950/[0.07] sm:rounded-[2rem] sm:px-10 sm:py-12 lg:col-span-7 xl:px-14 [&_ol]:max-w-none [&_p]:max-w-none [&_ul]:max-w-none"
+            className="rounded-[1.75rem] bg-white px-3.5 py-6 ring-1 min-[400px]:px-5 min-[400px]:py-8 ring-inset ring-forest-950/[0.07] sm:rounded-[2rem] sm:px-10 sm:py-12 lg:col-span-7 xl:px-14 [&_ol]:max-w-none [&_p]:max-w-none [&_ul]:max-w-none"
             style={{
               boxShadow: "0 1px 2px rgba(16,40,28,0.04), 0 30px 60px -38px rgba(16,40,28,0.28)",
             }}
@@ -273,7 +273,7 @@ export default function BlogPostPage({ post }: { post: BlogPost }) {
             {/* ---- answer box ---- */}
             <section
               aria-label="Short answer"
-              className="answer-block relative overflow-hidden rounded-[1.5rem] px-6 py-6 sm:px-7 sm:py-7"
+              className="answer-block relative overflow-hidden rounded-[1.5rem] px-5 py-5 sm:px-7 sm:py-7"
               style={{
                 background:
                   "radial-gradient(120% 120% at 0% 0%, var(--forest-700), var(--forest-950) 70%)",
@@ -296,7 +296,7 @@ export default function BlogPostPage({ post }: { post: BlogPost }) {
             {/* ---- key takeaways ---- */}
             <section
               aria-label="Key takeaways"
-              className="key-takeaways mt-8 rounded-[1.5rem] bg-forest-500/[0.05] p-6 ring-1 ring-inset ring-forest-700/10 sm:p-7"
+              className="key-takeaways mt-6 rounded-[1.5rem] bg-forest-500/[0.05] p-5 ring-1 ring-inset ring-forest-700/10 sm:mt-8 sm:p-7"
             >
               <h2 className="flex items-center gap-2 font-display text-[1.15rem] font-extrabold tracking-[-0.02em] text-forest-950">
                 <ListChecks aria-hidden className="h-5 w-5 text-forest-600" />

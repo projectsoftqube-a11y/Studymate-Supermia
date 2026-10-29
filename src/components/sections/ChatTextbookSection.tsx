@@ -399,7 +399,7 @@ export default function ChatTextbookSection() {
                         {done && (
                           <button
                             type="button"
-                            className="ml-1.5 font-bold text-forest-700 underline decoration-forest-500/40 decoration-2 underline-offset-2 transition-colors hover:text-forest-600"
+                            className="-my-2 ml-1.5 inline-block py-2 font-bold text-forest-700 underline decoration-forest-500/40 decoration-2 underline-offset-2 transition-colors hover:text-forest-600"
                           >
                             Open the page
                           </button>
