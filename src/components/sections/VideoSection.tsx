@@ -71,7 +71,7 @@ const BEATS = [
   },
   {
     Icon: ListChecks,
-    label: "Practise at your level",
+    label: "Practice at your level",
     detail: "Tests that step up or back with you",
   },
   {
@@ -161,7 +161,7 @@ export default function VideoSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".vd-eyebrow, .vd-heading, .vd-sub, .vd-card, .vd-beat, .vd-note", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });
@@ -239,7 +239,9 @@ export default function VideoSection() {
             </span>
 
             <h2 className="vd-heading mt-6 text-balance font-display text-[clamp(1.65rem,6.5vw,3.25rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-white">
-              <span className="block">Rather just</span>
+              {/* `{" "}` so the DOM text reads "Rather just be shown?" rather
+                  than "Rather justbe shown?". */}
+              <span className="block">Rather just</span>{" "}
               <span className="font-hand mt-2 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-300">
                 be shown?
               </span>
@@ -332,7 +334,7 @@ export default function VideoSection() {
                 <button
                   type="button"
                   onClick={() => setPlaying(true)}
-                  aria-label={`Play video: ${VIDEO.title}`}
+                  aria-label={`Play: ${VIDEO.title} (under 1 minute)`}
                   className="group absolute inset-0 h-full w-full cursor-pointer outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-forest-400"
                 >
                   <img
@@ -407,7 +409,7 @@ export default function VideoSection() {
 
                   {/* Corner badge. Names the format, so the reader knows this is a
                     short vertical clip and not a ten-minute webinar. */}
-                  <span className="absolute right-4 top-4 rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
+                  <span className="absolute right-4 top-4 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
                     Short
                   </span>
                 </button>

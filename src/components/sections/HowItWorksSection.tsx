@@ -3,7 +3,10 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { ArrowUpRight } from "lucide-react";
 import { refreshAfterFonts } from "@/lib/scroll-refresh";
+import { MagneticButton } from "@/components/ui/magnetic-button";
+import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 
@@ -27,8 +30,8 @@ gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 const STEPS = [
   {
     n: "01",
-    title: "Create your account",
-    desc: "One form, and 5,000 credits land in your account to spend on tutoring, tests and reports.",
+    title: "Create an account",
+    desc: "About 30 seconds. New accounts start with 5,000 free credits.",
     time: "30 sec",
     point: "5,000 free credits",
     image: "/how/create-your-account.webp",
@@ -36,17 +39,17 @@ const STEPS = [
   },
   {
     n: "02",
-    title: "Set your syllabus",
-    desc: "Pick country, board and standard once. Every answer afterwards stays inside that syllabus.",
+    title: "Set the syllabus",
+    desc: "About 1 minute. Choose country, board and class once.",
     time: "1 min",
-    point: "Answers match your board",
+    point: "Answers match the board",
     image: "/how/set-your-syllabus.webp",
     alt: "A globe with selector cards cascading from it",
   },
   {
     n: "03",
-    title: "Open your bookshelf",
-    desc: "Your textbooks arrive already processed, so any chapter is searchable the moment you open it.",
+    title: "Open the bookshelf",
+    desc: "The matching textbooks are already there. There is nothing to upload.",
     time: "Instant",
     point: "Nothing to upload",
     image: "/how/open-your-bookshelf.webp",
@@ -55,7 +58,7 @@ const STEPS = [
   {
     n: "04",
     title: "Work through a topic",
-    desc: "Ask questions in plain language and the session re-paces itself around what you already know.",
+    desc: "The student asks the chapter questions at their own pace.",
     time: "Your pace",
     point: "Adapts as you learn",
     image: "/how/work-through-a-topic.webp",
@@ -64,7 +67,7 @@ const STEPS = [
   {
     n: "05",
     title: "Test, then see the gaps",
-    desc: "Generate a paper, get it evaluated instantly, and see exactly which chapters still need work.",
+    desc: "The student takes a practice paper, gets it evaluated and sees what to study next.",
     time: "Ongoing",
     point: "See gaps by chapter",
     image: "/how/test-then-see-the-gaps.webp",
@@ -80,8 +83,9 @@ const DWELL = 5;
  *
  * Placement: section 1 says what StudyMate is, section 2 says why it is needed.
  * A reader convinced by those has one question left, "how do I actually use
- * this", and this answers it. It is also the page's highest-intent block for
- * search, hence the HowTo markup.
+ * this", and this answers it. The same steps have their own page at
+ * /how-it-works. No HowTo markup: the content package leaves it out, since
+ * Google no longer shows HowTo rich results.
  *
  * Design: the renders are dark, cinematic and edge-to-edge, so they cannot
  * be shrunk into icon slots without throwing away everything that makes them
@@ -171,7 +175,7 @@ export default function HowItWorksSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".hw-eyebrow, .hw-heading, .hw-sub, .hw-stage, .hw-item", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });
@@ -281,33 +285,11 @@ export default function HowItWorksSection() {
     return () => io.disconnect();
   }, []);
 
-  /* HowTo structured data. Search engines can render these steps directly in
-     results, the highest-value markup available to this page. Derived from STEPS
-     so the two cannot drift apart. */
-  const howToLd = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to study with StudyMate AI",
-    description:
-      "Five steps to start learning with StudyMate AI: create your account, set your syllabus, open your bookshelf, work through a topic, then test and see the gaps.",
-    step: STEPS.map((s, i) => ({
-      "@type": "HowToStep",
-      position: i + 1,
-      name: s.title,
-      text: s.desc,
-    })),
-  };
-
   return (
     /* Rides up over the section above via negative margin and stacking order.
        Pure CSS: the section above uses sticky internally for its own card stack,
        so a pin here would fight it. */
     <section ref={rootRef} id="how" className="relative isolate z-20 -mt-16 p-2 sm:-mt-24 sm:p-3">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
-      />
-
       <div className="relative overflow-clip rounded-[1.75rem] bg-surface py-20 sm:rounded-[2.25rem] sm:py-28">
         <div className="relative mx-auto max-w-site px-4 sm:px-6 lg:px-10">
           {/* ---------- heading ----------
@@ -338,15 +320,16 @@ export default function HowItWorksSection() {
             </span>
 
             <h2 className="hw-heading mt-6 text-balance font-display text-[clamp(1.65rem,7vw,3.5rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-forest-950">
-              <span className="block">Five steps.</span>
+              {/* `{" "}` keeps the two lines separate words in the DOM text;
+                  `block` only breaks them visually. */}
+              <span className="block">How StudyMate</span>{" "}
               <span className="font-hand mt-1 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-600">
-                About five minutes
+                AI Works
               </span>
             </h2>
 
             <p className="hw-sub mx-auto mt-6 max-w-xl text-pretty text-[1.0625rem] leading-relaxed text-forest-950/70">
-              From sign-up to your first tracked test in a single sitting. Nothing to install and no
-              manual to read.
+              Setup takes about five minutes in one sitting, and there is nothing to install.
             </p>
           </div>
 
@@ -385,7 +368,7 @@ export default function HowItWorksSection() {
                     beneath it, so the stage stays one object. The scrim keeps the
                     text legible over whichever frame is showing. */}
                 <div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-7"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 p-4 sm:p-7"
                   style={{
                     background:
                       "linear-gradient(0deg, rgba(3,26,16,0.82), rgba(3,26,16,0.45) 45%, transparent)",
@@ -407,11 +390,13 @@ export default function HowItWorksSection() {
                             "linear-gradient(90deg, color-mix(in oklab, var(--forest-300) 70%, transparent), transparent)",
                         }}
                       />
-                      <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-forest-300">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-forest-300 sm:text-[12px] sm:tracking-[0.16em]">
                         {STEPS[active].point}
                       </span>
-                      <span aria-hidden className="h-3 w-px bg-white/20" />
-                      <span className="font-numeric text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">
+                      {/* The time is in the step list too; on phones the plate keeps
+                          to one line rather than wrapping over the render. */}
+                      <span aria-hidden className="hidden h-3 w-px bg-white/20 sm:block" />
+                      <span className="hidden font-numeric text-[11px] font-bold uppercase tracking-[0.18em] text-white/50 sm:inline">
                         {STEPS[active].time}
                       </span>
                     </span>
@@ -419,12 +404,8 @@ export default function HowItWorksSection() {
                     {/* The step title, at display size on the plate. Previously
                         the title lived only in the index, so the stage showed an
                         image with no idea what it depicted. */}
-                    <h3 className="mt-2.5 font-display text-[clamp(1.1rem,3.8vw,1.75rem)] font-extrabold leading-tight tracking-[-0.03em] text-white">
+                    <p className="mt-2.5 font-display text-[clamp(1.1rem,3.8vw,1.75rem)] font-extrabold leading-tight tracking-[-0.03em] text-white">
                       {STEPS[active].title}
-                    </h3>
-
-                    <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed text-white/75">
-                      {STEPS[active].desc}
                     </p>
                   </div>
                 </div>
@@ -436,100 +417,120 @@ export default function HowItWorksSection() {
                 meaning; buttons because each one is genuinely actionable, which
                 also makes the whole thing keyboard-navigable for free. */}
             <ol className="lg:col-span-5">
-              {STEPS.map(({ n, title, time, point }, i) => {
+              {STEPS.map(({ n, title, time, point, desc }, i) => {
                 const on = i === active;
                 return (
                   <li key={n} className="hw-item">
-                    <button
-                      type="button"
-                      onMouseEnter={() => pick(i)}
-                      onFocus={() => pick(i)}
-                      onClick={() => pick(i)}
-                      aria-current={on ? "step" : undefined}
-                      /* NO `border-t` here.
+                    {/* Each step is an <h3> wrapping its button, with its
+                        description in the HTML beneath it: every step's text is
+                        in the server render, not only the active one's. The
+                        number, tag and time are drawn from data attributes by
+                        `::before`, so the heading text is the step title alone;
+                        the caption plate shows the active step's tag and time. */}
+                    <h3>
+                      <button
+                        type="button"
+                        onMouseEnter={() => pick(i)}
+                        onFocus={() => pick(i)}
+                        onClick={() => pick(i)}
+                        aria-current={on ? "step" : undefined}
+                        /* NO `border-t` here.
                          A CSS border sits outside the element's box at 1px while
                          the progress bar sat inside it at 2px, so the two rules
                          were offset by a pixel and different weights — the line
                          visibly stepped up and down where one met the other. The
                          divider is now drawn by the track below, which the fill
                          runs along, so there is only ever ONE line. */
-                      className="group relative flex w-full items-baseline gap-4 py-4 text-left outline-none sm:gap-5 sm:py-5"
-                    >
-                      {/* Track and fill share one box, so the resting rule and
+                        className="group relative flex w-full items-baseline gap-4 py-4 text-left outline-none sm:gap-5 sm:py-5"
+                      >
+                        {/* Track and fill share one box, so the resting rule and
                           the timer are the same line at the same weight. The
                           track is the divider; the fill is the countdown, which
                           advances the step when it completes. */}
-                      <span
-                        aria-hidden
-                        className="absolute inset-x-0 top-0 h-px overflow-hidden"
-                        style={{
-                          background: "color-mix(in oklab, var(--forest-950) 8%, transparent)",
-                        }}
-                      >
                         <span
-                          className={`hw-progress hw-progress-${i} block h-full w-full origin-left`}
+                          aria-hidden
+                          className="absolute inset-x-0 top-0 h-px overflow-hidden"
                           style={{
-                            /* Reader-driven rows have no countdown to show, so
-                               the bar simply sits filled on the active one. */
-                            transform: taken ? (on ? "scaleX(1)" : "scaleX(0)") : "scaleX(0)",
-                            transition: taken
-                              ? "transform 400ms cubic-bezier(0.22,1,0.36,1)"
-                              : "none",
-                            background:
-                              "linear-gradient(90deg, var(--forest-600), color-mix(in oklab, var(--forest-400) 70%, transparent))",
+                            background: "color-mix(in oklab, var(--forest-950) 8%, transparent)",
                           }}
-                        />
-                      </span>
-
-                      <span
-                        className={`font-numeric text-[clamp(1.3rem,3.6vw,2rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors duration-400 ${
-                          on
-                            ? "text-forest-600"
-                            : "text-forest-950/15 group-hover:text-forest-950/30"
-                        }`}
-                      >
-                        {n}
-                      </span>
-
-                      <span className="min-w-0 flex-1">
-                        <span
-                          className={`block font-display text-[clamp(0.98rem,3vw,1.35rem)] font-extrabold leading-tight tracking-[-0.025em] transition-colors duration-400 ${
-                            on
-                              ? "text-forest-950"
-                              : "text-forest-950/70 group-hover:text-forest-950"
-                          }`}
                         >
-                          {title}
+                          <span
+                            className={`hw-progress hw-progress-${i} block h-full w-full origin-left`}
+                            style={{
+                              /* Reader-driven rows have no countdown to show, so
+                               the bar simply sits filled on the active one. */
+                              transform: taken ? (on ? "scaleX(1)" : "scaleX(0)") : "scaleX(0)",
+                              transition: taken
+                                ? "transform 400ms cubic-bezier(0.22,1,0.36,1)"
+                                : "none",
+                              background:
+                                "linear-gradient(90deg, var(--forest-600), color-mix(in oklab, var(--forest-400) 70%, transparent))",
+                            }}
+                          />
                         </span>
 
-                        {/* The payoff line. The title says what the reader DOES;
+                        <span
+                          aria-hidden
+                          data-label={n}
+                          className={`before:content-[attr(data-label)] font-numeric text-[clamp(1.3rem,3.6vw,2rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors duration-400 ${
+                            on
+                              ? "text-forest-600"
+                              : "text-forest-950/15 group-hover:text-forest-950/30"
+                          }`}
+                        />
+
+                        <span className="min-w-0 flex-1">
+                          <span
+                            className={`block font-display text-[clamp(0.98rem,3vw,1.35rem)] font-extrabold leading-tight tracking-[-0.025em] transition-colors duration-400 ${
+                              on
+                                ? "text-forest-950"
+                                : "text-forest-950/70 group-hover:text-forest-950"
+                            }`}
+                          >
+                            {title}
+                          </span>
+
+                          {/* The payoff line. The title says what the reader DOES;
                             this says what they GET, which is the part that earns
                             attention. Previously it only existed in the caption
                             over the image, so most benefits were
                             invisible at any moment. */}
-                        <span
-                          className={`mt-1 flex items-center gap-1.5 transition-colors duration-400 ${
-                            on ? "text-forest-700" : "text-forest-950/70"
-                          }`}
-                        >
                           <span
-                            aria-hidden
-                            className={`h-1 w-1 shrink-0 rounded-full transition-colors duration-400 ${
-                              on ? "bg-forest-500" : "bg-forest-950/25"
+                            className={`mt-1 flex items-center gap-1.5 transition-colors duration-400 ${
+                              on ? "text-forest-700" : "text-forest-950/70"
                             }`}
-                          />
-                          <span className="text-[12.5px] font-bold leading-snug">{point}</span>
+                          >
+                            <span
+                              aria-hidden
+                              className={`h-1 w-1 shrink-0 rounded-full transition-colors duration-400 ${
+                                on ? "bg-forest-500" : "bg-forest-950/25"
+                              }`}
+                            />
+                            <span
+                              aria-hidden
+                              data-label={point}
+                              className="text-[12.5px] font-bold leading-snug before:content-[attr(data-label)]"
+                            />
+                          </span>
                         </span>
-                      </span>
 
-                      <span
-                        className={`shrink-0 font-numeric text-[11px] font-bold uppercase tracking-[0.16em] transition-colors duration-400 ${
-                          on ? "text-forest-700" : "text-forest-950/30"
-                        }`}
-                      >
-                        {time}
-                      </span>
-                    </button>
+                        <span
+                          aria-hidden
+                          data-label={time}
+                          className={`shrink-0 font-numeric text-[11px] before:content-[attr(data-label)] font-bold uppercase tracking-[0.16em] transition-colors duration-400 ${
+                            on ? "text-forest-700" : "text-forest-950/30"
+                          }`}
+                        />
+                      </button>
+                    </h3>
+                    <div
+                      className="grid transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      style={{ gridTemplateRows: on ? "1fr" : "0fr" }}
+                    >
+                      <p className="overflow-hidden pl-[calc(clamp(1.3rem,3.6vw,2rem)+1rem)] text-[14.5px] leading-relaxed text-forest-950/70 sm:pl-[calc(clamp(1.3rem,3.6vw,2rem)+1.25rem)]">
+                        <span className="block pb-4">{desc}</span>
+                      </p>
+                    </div>
                   </li>
                 );
               })}
@@ -543,6 +544,23 @@ export default function HowItWorksSection() {
                 style={{ background: "color-mix(in oklab, var(--forest-950) 8%, transparent)" }}
               />
             </ol>
+          </div>
+
+          {/* The section ends on the step a reader can take now. Centred under
+              the grid rather than tucked into the index, where it would read
+              as a sixth step. */}
+          <div className="mt-12 flex justify-center">
+            <MagneticButton
+              as="a"
+              href={APP_URL}
+              {...EXTERNAL_LINK_PROPS}
+              variant="ink"
+              size="md"
+              roll={false}
+            >
+              Start free
+              <ArrowUpRight className="h-4 w-4" />
+            </MagneticButton>
           </div>
         </div>
       </div>

@@ -6,12 +6,14 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { APP_URL, SITE_URL } from "../lib/site";
+import { SITE_URL } from "../lib/site";
+import { OG_IMAGE, ORG_ID, SOFTWARE_ID, WEBSITE_ID } from "../lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -35,7 +37,10 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+/* `ErrorComponentProps`, not `{ error: Error }`: the router types `error` as
+   `unknown` (anything can be thrown), and the narrower annotation failed the
+   typecheck. Nothing below needs it to be an Error. */
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -78,32 +83,32 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
  *
  * Three linked nodes in one graph rather than three separate <script> blocks,
  * so `@id` references resolve and engines read them as one entity rather than
- * three unrelated claims.
+ * three unrelated claims. Every route adds its own WebPage node that points back
+ * at these by `@id` (see `pageGraph` in lib/seo).
  *
  * This is the AEO/GEO layer: answer engines and LLM crawlers extract entities,
- * not keywords. Naming the organisation, what the product is, who it is for and
- * what it costs, in machine-readable form, is what lets an assistant answer
- * "what is StudyMate AI" correctly instead of guessing from prose.
+ * not keywords. Naming the organisation, what the product is and who it is for,
+ * in machine-readable form, is what lets an assistant answer "what is StudyMate
+ * AI" correctly instead of guessing from prose.
  *
- * Every value here is verifiable from the site or the brochure. No ratings, no
- * review counts, no adoption figures: fabricated `aggregateRating` is both a
- * lie and a manual-action risk.
+ * Values follow the content package's schema.jsonld and are verifiable from the
+ * site, the privacy policy or SuperMIA's own profiles. No ratings, review counts
+ * or adoption figures: fabricated `aggregateRating` is both a lie and a
+ * manual-action risk. No `offers` either, until credit costs are published.
  */
-const ORGANIZATION_ID = `${SITE_URL}/#organization`;
-const WEBSITE_ID = `${SITE_URL}/#website`;
-
 const siteLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
-      "@id": ORGANIZATION_ID,
-      name: "StudyMate AI",
-      url: `${SITE_URL}/`,
-      logo: `${SITE_URL}/logo.png`,
-      email: "hello@supermia.ai",
+      "@id": ORG_ID,
+      name: "SuperMIA",
+      legalName: "Botfinity Inc.",
       description:
-        "StudyMate AI builds an AI study companion that answers from a student's own textbooks, adapts to their level, and reports progress chapter by chapter.",
+        "SuperMIA is the conversational AI platform from Botfinity, building AI voice and chat agents for industries including education. StudyMate AI is its AI tutor for school students.",
+      url: "https://supermia.ai/",
+      email: "hello@supermia.ai",
+      logo: { "@type": "ImageObject", url: "https://supermia.ai/images/logo.svg" },
       address: {
         "@type": "PostalAddress",
         streetAddress: "2451 W Grapevine Mills Cir #547",
@@ -112,108 +117,64 @@ const siteLd = {
         postalCode: "76051",
         addressCountry: "US",
       },
-      contactPoint: {
-        "@type": "ContactPoint",
-        contactType: "customer support",
-        email: "hello@supermia.ai",
-        availableLanguage: ["en"],
-      },
+      sameAs: [
+        "https://www.linkedin.com/showcase/mia-my-intelligent-assistant",
+        "https://www.youtube.com/@MIAMyIntelligentAssistant",
+        "https://twitter.com/supermia_ai",
+      ],
     },
     {
       "@type": "WebSite",
       "@id": WEBSITE_ID,
       url: `${SITE_URL}/`,
       name: "StudyMate AI",
-      publisher: { "@id": ORGANIZATION_ID },
-      inLanguage: "en",
+      alternateName: ["StudyMate AI by SuperMIA", "StudyMate"],
+      inLanguage: "en-US",
+      publisher: { "@id": ORG_ID },
     },
     {
       "@type": "SoftwareApplication",
+      "@id": SOFTWARE_ID,
       name: "StudyMate AI",
+      url: `${SITE_URL}/`,
       applicationCategory: "EducationalApplication",
-      applicationSubCategory: "AI tutoring",
+      applicationSubCategory: "AI tutor",
       operatingSystem: "Web browser",
-      url: APP_URL,
-      publisher: { "@id": ORGANIZATION_ID },
       description:
-        "An AI tutor that answers from your own textbooks. Chat through any chapter, generate practice papers at your level, get instant evaluation, and see which chapters still need work.",
+        "An AI tutor for school students that answers from their own syllabus textbooks with the page cited, adapts practice to their level, generates chapter practice papers with instant evaluation and shows which chapters to study next.",
       featureList: [
-        "Chat with your textbook",
-        "Adaptive AI tutoring that re-paces to the student",
-        "Practice paper generation by chapter and difficulty",
+        "Preloaded syllabus textbooks by country, board and class",
+        "Chat with a textbook chapter, with the page cited",
+        "Adaptive tutoring at three levels: know, use, reason",
+        "Practice paper generator for any chapter",
         "Instant, detailed evaluation",
-        "Chapter-level progress reporting",
+        "Chapter-level progress reports with a weakest-first study list",
       ],
-      audience: {
-        "@type": "EducationalAudience",
-        educationalRole: ["student", "teacher", "parent"],
-      },
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-        description: "Free starter credits, no card required.",
-      },
+      audience: { "@type": "EducationalAudience", educationalRole: "student" },
+      image: OG_IMAGE.url,
+      publisher: { "@id": ORG_ID },
+      provider: { "@id": ORG_ID },
     },
   ],
 };
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  /* Sitewide tags only. Title, description, robots, canonical and the og:/
+     twitter: page fields come from each route's `pageHead`, so no page can
+     silently inherit the homepage's. The title below is the fallback for the
+     404 and error screens, which have no registry entry. */
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      /* Title: entity first, then what it does, then who for. Answer engines
-         and search both lead on the entity name, and "AI tutor" is the phrase
-         people actually search rather than "study companion". Kept under ~60
-         characters so it is not truncated in results. */
-      { title: "StudyMate AI: AI Tutor for Your Own Textbooks" },
-      {
-        name: "description",
-        content:
-          "StudyMate AI is an AI tutor that answers from your own textbooks. Pick your board and class, chat through any chapter, generate practice papers, get instant evaluation, and see which chapters still need work.",
-      },
+      { title: "StudyMate AI" },
       { name: "author", content: "StudyMate AI" },
       { name: "theme-color", content: "#012715" },
-      { name: "robots", content: "index, follow, max-image-preview:large" },
-      /* AEO. Answer engines summarise a page from its own claims, so the most
-         useful thing a page can carry is one plain sentence defining the entity
-         in the form an assistant would quote back. */
-      {
-        name: "summary",
-        content:
-          "StudyMate AI is an AI study tool for school students. It answers questions from the student's own syllabus textbooks, adapts question difficulty to their level, generates practice papers by chapter, evaluates them instantly, and reports progress chapter by chapter.",
-      },
       { property: "og:site_name", content: "StudyMate AI" },
       { property: "og:locale", content: "en_US" },
-      { property: "og:title", content: "StudyMate AI: AI Tutor for Your Own Textbooks" },
-      {
-        property: "og:description",
-        content:
-          "An AI tutor that answers from your own textbooks. Chat through any chapter, practise at your level, and see exactly what to study next.",
-      },
-      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "StudyMate AI: AI Tutor for Your Own Textbooks" },
-      {
-        name: "twitter:description",
-        content:
-          "An AI tutor that answers from your own textbooks. Chat through any chapter, practise at your level, and see exactly what to study next.",
-      },
-      /* Self-hosted, absolute. These previously pointed at a Lovable scaffolding
-         preview on a third-party R2 bucket: every social share depended on
-         infrastructure this project does not control, and one bucket change
-         would have silently broken every card already in the wild.
-         Crawlers do not resolve relative URLs here, so the origin is explicit. */
-      { property: "og:url", content: `${SITE_URL}/` },
-      { property: "og:image", content: `${SITE_URL}/og-image.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      {
-        property: "og:image:alt",
-        content: "StudyMate AI: your personal AI study companion",
-      },
-      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
+      /* SuperMIA's handle until StudyMate has its own. */
+      { name: "twitter:site", content: "@supermia_ai" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -221,8 +182,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
          `links` from the root and the matched route are concatenated rather than
          deduped by `rel`, so a canonical declared at this level would render on
          every page alongside the route's own and point /privacy and /terms back
-         at the homepage. Each route declares its own instead — see
-         `routes/index.tsx` for the reasoning about preview hostnames. */
+         at the homepage. Each route declares its own through `pageHead` in
+         lib/seo, which also explains why it never uses the request host. */
       /* Icons. PNGs at explicit sizes first so a browser picks the right one
          without downscaling, then the multi-res .ico as the universal fallback
          (which browsers request at /favicon.ico regardless of markup anyway).
@@ -257,8 +218,8 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         {/* Organisation / WebSite / SoftwareApplication graph. Rendered here
             rather than in a section component so it is present on every route
-            and is not tied to any one block of copy. The page's HowTo and
-            FAQPage schema live with the sections that generate them. */}
+            and is not tied to any one block of copy. Each route's WebPage,
+            BreadcrumbList and FAQPage nodes come from its own `head`. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteLd) }}

@@ -10,12 +10,66 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ExamRevisionRouteImport } from './routes/exam-revision'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ForParentsRouteImport } from './routes/for-parents'
+import { Route as GlossaryRouteImport } from './routes/glossary'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as FeaturesAdaptiveTutoringRouteImport } from './routes/features/adaptive-tutoring'
+import { Route as FeaturesChatWithYourTextbookRouteImport } from './routes/features/chat-with-your-textbook'
+import { Route as FeaturesPracticeTestsRouteImport } from './routes/features/practice-tests'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamRevisionRoute = ExamRevisionRouteImport.update({
+  id: '/exam-revision',
+  path: '/exam-revision',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForParentsRoute = ForParentsRouteImport.update({
+  id: '/for-parents',
+  path: '/for-parents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlossaryRoute = GlossaryRouteImport.update({
+  id: '/glossary',
+  path: '/glossary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -23,40 +77,180 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesAdaptiveTutoringRoute =
+  FeaturesAdaptiveTutoringRouteImport.update({
+    id: '/features/adaptive-tutoring',
+    path: '/features/adaptive-tutoring',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FeaturesChatWithYourTextbookRoute =
+  FeaturesChatWithYourTextbookRouteImport.update({
+    id: '/features/chat-with-your-textbook',
+    path: '/features/chat-with-your-textbook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FeaturesPracticeTestsRoute = FeaturesPracticeTestsRouteImport.update({
+  id: '/features/practice-tests',
+  path: '/features/practice-tests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/exam-revision': typeof ExamRevisionRoute
+  '/faq': typeof FaqRoute
+  '/for-parents': typeof ForParentsRoute
+  '/glossary': typeof GlossaryRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/features/adaptive-tutoring': typeof FeaturesAdaptiveTutoringRoute
+  '/features/chat-with-your-textbook': typeof FeaturesChatWithYourTextbookRoute
+  '/features/practice-tests': typeof FeaturesPracticeTestsRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/exam-revision': typeof ExamRevisionRoute
+  '/faq': typeof FaqRoute
+  '/for-parents': typeof ForParentsRoute
+  '/glossary': typeof GlossaryRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/features/adaptive-tutoring': typeof FeaturesAdaptiveTutoringRoute
+  '/features/chat-with-your-textbook': typeof FeaturesChatWithYourTextbookRoute
+  '/features/practice-tests': typeof FeaturesPracticeTestsRoute
+  '/blog': typeof BlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/exam-revision': typeof ExamRevisionRoute
+  '/faq': typeof FaqRoute
+  '/for-parents': typeof ForParentsRoute
+  '/glossary': typeof GlossaryRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/features/adaptive-tutoring': typeof FeaturesAdaptiveTutoringRoute
+  '/features/chat-with-your-textbook': typeof FeaturesChatWithYourTextbookRoute
+  '/features/practice-tests': typeof FeaturesPracticeTestsRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/terms'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/exam-revision'
+    | '/faq'
+    | '/for-parents'
+    | '/glossary'
+    | '/how-it-works'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/blog/$slug'
+    | '/features/adaptive-tutoring'
+    | '/features/chat-with-your-textbook'
+    | '/features/practice-tests'
+    | '/blog/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/terms'
-  id: '__root__' | '/' | '/privacy' | '/terms'
+  to:
+    | '/'
+    | '/about'
+    | '/exam-revision'
+    | '/faq'
+    | '/for-parents'
+    | '/glossary'
+    | '/how-it-works'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/blog/$slug'
+    | '/features/adaptive-tutoring'
+    | '/features/chat-with-your-textbook'
+    | '/features/practice-tests'
+    | '/blog'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/exam-revision'
+    | '/faq'
+    | '/for-parents'
+    | '/glossary'
+    | '/how-it-works'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/terms'
+    | '/blog/$slug'
+    | '/features/adaptive-tutoring'
+    | '/features/chat-with-your-textbook'
+    | '/features/practice-tests'
+    | '/blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ExamRevisionRoute: typeof ExamRevisionRoute
+  FaqRoute: typeof FaqRoute
+  ForParentsRoute: typeof ForParentsRoute
+  GlossaryRoute: typeof GlossaryRoute
+  HowItWorksRoute: typeof HowItWorksRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  FeaturesAdaptiveTutoringRoute: typeof FeaturesAdaptiveTutoringRoute
+  FeaturesChatWithYourTextbookRoute: typeof FeaturesChatWithYourTextbookRoute
+  FeaturesPracticeTestsRoute: typeof FeaturesPracticeTestsRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +262,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam-revision': {
+      id: '/exam-revision'
+      path: '/exam-revision'
+      fullPath: '/exam-revision'
+      preLoaderRoute: typeof ExamRevisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-parents': {
+      id: '/for-parents'
+      path: '/for-parents'
+      fullPath: '/for-parents'
+      preLoaderRoute: typeof ForParentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glossary': {
+      id: '/glossary'
+      path: '/glossary'
+      fullPath: '/glossary'
+      preLoaderRoute: typeof GlossaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -82,13 +339,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/adaptive-tutoring': {
+      id: '/features/adaptive-tutoring'
+      path: '/features/adaptive-tutoring'
+      fullPath: '/features/adaptive-tutoring'
+      preLoaderRoute: typeof FeaturesAdaptiveTutoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/chat-with-your-textbook': {
+      id: '/features/chat-with-your-textbook'
+      path: '/features/chat-with-your-textbook'
+      fullPath: '/features/chat-with-your-textbook'
+      preLoaderRoute: typeof FeaturesChatWithYourTextbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/practice-tests': {
+      id: '/features/practice-tests'
+      path: '/features/practice-tests'
+      fullPath: '/features/practice-tests'
+      preLoaderRoute: typeof FeaturesPracticeTestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ExamRevisionRoute: ExamRevisionRoute,
+  FaqRoute: FaqRoute,
+  ForParentsRoute: ForParentsRoute,
+  GlossaryRoute: GlossaryRoute,
+  HowItWorksRoute: HowItWorksRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  FeaturesAdaptiveTutoringRoute: FeaturesAdaptiveTutoringRoute,
+  FeaturesChatWithYourTextbookRoute: FeaturesChatWithYourTextbookRoute,
+  FeaturesPracticeTestsRoute: FeaturesPracticeTestsRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -10,23 +10,32 @@ import VideoSection from "@/components/sections/VideoSection";
 import AnalyticsSection from "@/components/sections/AnalyticsSection";
 import ChatTextbookSection from "@/components/sections/ChatTextbookSection";
 import AdaptiveSection from "@/components/sections/AdaptiveSection";
+import HomeDetailsSection from "@/components/sections/HomeDetailsSection";
 import FAQSection from "@/components/sections/FAQSection";
-import BrochureSection from "@/components/sections/BrochureSection";
 import ClosingCTASection from "@/components/sections/ClosingCTASection";
 import Footer from "@/components/sections/Footer";
-import { SITE_URL } from "@/lib/site";
+import { PAGES } from "@/content/pages";
+import { OG_IMAGE, SOFTWARE_ID, pageGraph, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  /* Canonical only. Every other tag this page needs is already correct on the
-     root route, which is written for the homepage.
-     Vercel serves this deployment on several hostnames (the project domain plus
-     a per-commit preview URL for every push), and without this each one is a
-     separate indexable copy competing with the others. It sits here rather than
-     in the root shell because `links` are concatenated across matched routes,
-     so a root-level canonical would also stamp itself on /privacy and /terms. */
-  head: () => ({
-    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
-  }),
+  /* Title, description, robots, canonical and social tags from the registry,
+     like every route. The WebPage node additionally names the product as the
+     page's main entity: the homepage is the page about StudyMate itself. */
+  head: () =>
+    pageHead(
+      PAGES.home,
+      pageGraph(PAGES.home, {
+        node: {
+          mainEntity: { "@id": SOFTWARE_ID },
+          primaryImageOfPage: {
+            "@type": "ImageObject",
+            url: OG_IMAGE.url,
+            width: OG_IMAGE.width,
+            height: OG_IMAGE.height,
+          },
+        },
+      }),
+    ),
   component: Index,
 });
 
@@ -67,6 +76,8 @@ function Index() {
           sits beneath it by design — no spacer, the copy is centred in the panel
           and clears the pill on its own. */}
       <SiteHeader />
+      {/* Target of the header's "Skip to content" link. */}
+      <span id="content" />
 
       {/* The argument, in order: what it is, why you need it, how to start,
           whether it works, and finally the thing itself working. */}
@@ -93,16 +104,18 @@ function Index() {
           to carry on practising in the real product, so the last thing a reader
           does is the conversion step. */}
       <AdaptiveSection />
-      {/* Last: the quiz ends by inviting a signup, and the gap between finishing
-          it and clicking is where unspoken doubts surface. These answer them,
-          and carry the page's FAQPage structured data. */}
+      {/* The facts a decider checks before signing up: practice papers, what
+          sets StudyMate apart, the parent view and what it costs to start. */}
+      <HomeDetailsSection />
+      {/* The quiz and the facts above end on an invitation to sign up, and the
+          gap before clicking is where unspoken doubts surface. A five-question
+          preview answers them; the full set, and the site's only FAQPage
+          markup, live on /faq. */}
       <FAQSection />
-      {/* Penultimate: by here the objections are answered, but the reader is
-          often not the person who decides — a student shows a parent, a teacher
-          shows a head of department. This hands them the brochure to take away,
-          and deliberately does not ask for the signup, so it does not compete
-          with the close immediately below it. */}
-      <BrochureSection />
+      {/* The brochure section is out until a corrected PDF exists: the current
+          one carries a "Powered By otfinity" typo, a "Hire StudyMate" step and
+          an unsourced 48% to 82% case study. BrochureSection.tsx is kept so it
+          can return once the file is fixed. */}
       {/* The close. Carries `id="start"`, so every "Start free" button on the
           page scrolls here rather than to a dead anchor. */}
       <ClosingCTASection />

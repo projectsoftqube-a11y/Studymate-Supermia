@@ -2,19 +2,31 @@
  * SiteHeader — floating forest-glass capsule.
  *
  * One element, two states, cross-faded on scroll rather than swapped:
- *   at rest  — wide and transparent, sitting inside the hero's own padding
- *   scrolled — contracts into a narrower frosted island that detaches from the
- *              top edge, gains a forest-tinted hairline ring and a layered green
- *              shadow
+ *   at rest  — sitting inside the hero's own padding
+ *   scrolled — tucks closer to the top edge with a deeper, layered green shadow
  *
  * Signature interactions:
- *   1. Sliding pill     — one FLIP-style indicator tracks the hovered link and
- *                         parks on the section in view. Constant 2 tweens for N
- *                         links, vs. N transitions if each link animated itself.
- *   2. Trailing glow    — an emerald blur follows the pill a beat behind, so the
- *                         nav reads as lit rather than merely highlighted.
- *   3. Character roll   — link labels split per glyph; the visible copy rolls up
- *                         and out while a duplicate rolls in from below, L→R.
+ *   1. Sliding pill     — one FLIP-style indicator tracks the hovered item and
+ *                         parks on the current page's item. Constant 2 tweens
+ *                         for N items, vs. N transitions if each animated itself.
+ *   2. Trailing glow    — an emerald underline follows the pill a beat behind,
+ *                         so the nav reads as lit rather than merely highlighted.
+ *   3. Character roll   — labels split per glyph; the printed copy rolls up and
+ *                         out while a handwritten duplicate rolls in from below.
+ *
+ * Menu: Features ▾ · How it works · About · Blog · FAQ, then Sign in and Start free. The
+ * Features dropdown opens as a compact card under the capsule, each item
+ * carrying a one-line tagline (the pattern the strongest study-tool sites use).
+ * Guides and the glossary are reached from Blog and the footer.
+ *
+ * SEO rules it follows (content package, Navigation Spec):
+ *   - every item is a real <a href>; dropdown and mobile links are in the HTML
+ *     on load and hidden with CSS, never mounted on hover or fetched
+ *   - an item renders only once its page is live (`isLive`), so the menu can
+ *     never link to a 404
+ *   - desktop and mobile carry the same links, since Google indexes mobile
+ *   - the current page is marked `aria-current="page"`
+ *   - "Skip to content" is the first focusable element
  *
  * Scroll state comes from ScrollTrigger, not a React scroll listener: the class
  * toggle fires once per threshold crossing instead of once per scroll event.
@@ -22,26 +34,102 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  Gauge,
+  GraduationCap,
+  ListChecks,
+  Menu,
+  MessageCircleQuestion,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LogoLink } from "@/components/brand/Logo";
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { PAGES, isLive } from "@/content/pages";
 import { APP_URL, EXTERNAL_LINK_PROPS } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const NAV = [
-  /* Every entry must point at a section that actually exists on the page.
-     `features`, `journey` and `pricing` were left over from sections that have
-     since been removed, so all three scrolled nowhere. A nav link that silently
-     does nothing is worse than one fewer link. */
-  { id: "problem", label: "Why StudyMate" },
-  { id: "how", label: "How it works" },
-  { id: "analytics", label: "Your progress" },
-  { id: "chat", label: "See it work" },
-] as const;
+interface MenuLink {
+  label: string;
+  href: string;
+  description: string;
+  Icon: LucideIcon;
+}
+
+interface Dropdown {
+  key: "features";
+  label: string;
+  /** One or two columns, each with a small heading. */
+  columns: { title: string; links: MenuLink[] }[];
+  /** Section of the site the dropdown covers, for the active state. */
+  owns: (path: string) => boolean;
+}
+
+/** Keeps only links whose page is live; a held or unbuilt page drops out. */
+const live = (links: MenuLink[]) => links.filter(({ href }) => isLive(href));
+
+const DROPDOWNS: Dropdown[] = [
+  {
+    key: "features",
+    label: "Features",
+    owns: (path) => path.startsWith("/features/") || path === PAGES.examRevision.path,
+    columns: [
+      {
+        title: "Features",
+        links: live([
+          {
+            label: PAGES.chat.label,
+            href: PAGES.chat.path,
+            description: "Answers from the chapter, with the page cited",
+            Icon: MessageCircleQuestion,
+          },
+          {
+            label: PAGES.adaptive.label,
+            href: PAGES.adaptive.path,
+            description: "Harder only when they're ready",
+            Icon: Gauge,
+          },
+          {
+            label: PAGES.tests.label,
+            href: PAGES.tests.path,
+            description: "Papers from any chapter, evaluated instantly",
+            Icon: ListChecks,
+          },
+          {
+            label: "Exam revision",
+            href: PAGES.examRevision.path,
+            description: "Chapter-by-chapter revision",
+            Icon: GraduationCap,
+          },
+        ]),
+      },
+    ],
+  },
+];
+
+/**
+ * Plain links after the dropdowns. Each destination appears once in the
+ * header: a page linked here is not repeated inside a dropdown.
+ * For Parents joins when its page is live.
+ */
+const LINKS = [
+  { label: "How it works", href: PAGES.howItWorks.path },
+  { label: "About", href: PAGES.about.path },
+  { label: "Blog", href: PAGES.blog.path },
+  { label: "FAQ", href: PAGES.faq.path },
+  /* Held until its page is live; `isLive` drops it until then. */
+  { label: "For parents", href: PAGES.parents.path },
+].filter(({ href }) => isLive(href));
+
+/** Pill keys in render order: the dropdown triggers, then each link. */
+const PILL_KEYS: string[] = [...DROPDOWNS.map((d) => d.key), ...LINKS.map((l) => l.href)];
 
 /**
  * A label split into per-character spans, doubled. The visible copy rolls up and
@@ -91,31 +179,69 @@ function RollingLabel({ text }: { text: string }) {
   );
 }
 
+/** One icon-led row inside a dropdown card or the mobile sheet. */
+function MenuItem({
+  link,
+  current,
+  onNavigate,
+}: {
+  link: MenuLink;
+  current: boolean;
+  onNavigate: () => void;
+}) {
+  const { Icon } = link;
+  return (
+    <a
+      href={link.href}
+      aria-current={current ? "page" : undefined}
+      onClick={onNavigate}
+      className={`group flex items-start gap-3 rounded-xl px-3 py-2.5 outline-none transition-colors duration-200 hover:bg-forest-950/[0.04] focus-visible:bg-forest-950/[0.04] focus-visible:outline-2 focus-visible:outline-forest-500 ${
+        current ? "bg-forest-500/[0.08]" : ""
+      }`}
+    >
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-forest-500/10 text-forest-700 ring-1 ring-inset ring-forest-700/10 transition-colors duration-200 group-hover:bg-forest-600 group-hover:text-white">
+        <Icon aria-hidden className="h-4 w-4" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[14px] font-bold leading-tight text-forest-950">
+          {link.label}
+        </span>
+        <span className="mt-0.5 block text-[12px] leading-snug text-forest-950/55">
+          {link.description}
+        </span>
+      </span>
+    </a>
+  );
+}
+
 export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
   const glowRef = useRef<HTMLSpanElement>(null);
-  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const itemRefs = useRef<Array<HTMLElement | null>>([]);
+  /* Set when hover opened a dropdown, so the click that usually follows a
+     hover does not immediately shut what the pointer just opened. */
+  const hoverOpened = useRef(false);
 
   const [scrolled, setScrolled] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [hoverId, setHoverId] = useState<string | null>(null);
+  const [hoverKey, setHoverKey] = useState<string | null>(null);
+  const [openMenu, setOpenMenu] = useState<Dropdown["key"] | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<Dropdown["key"] | null>(null);
 
-  /* The header is mounted on the legal routes too, where none of these sections
-     exist. A bare `#how` there is a link that visibly does nothing, so off the
-     homepage the anchors are rewritten to `/#how` and navigate home first.
-     On `/` they stay bare, which keeps them in Lenis's delegated anchor handler
-     (it only claims hrefs starting with `#`) rather than triggering a route
-     change to the page you are already on. */
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const onHome = pathname === "/";
-  const sectionHref = (id: string) => (onHome ? `#${id}` : `/#${id}`);
 
-  /* Pill follows hover when there is one, otherwise parks on the in-view
-     section. Null on both (top of page) fades it out entirely. */
-  const pillTargetId = hoverId ?? activeId;
+  /* The current page, as a pill key: the dropdown that owns it, or the link. */
+  const activeKey = pathname.startsWith("/blog")
+    ? PAGES.blog.path
+    : (DROPDOWNS.find((d) => d.owns(pathname))?.key ??
+      LINKS.find((l) => l.href === pathname)?.href ??
+      null);
+
+  /* Pill follows hover when there is one, otherwise parks on the current page.
+     Null on both (the homepage, at rest) fades it out entirely. */
+  const pillTargetKey = hoverKey ?? activeKey;
 
   useGSAP(
     () => {
@@ -130,46 +256,18 @@ export function SiteHeader() {
           0.14,
         );
 
-      /* Dock / undock. */
+      /* Dock / undock.
+
+         NO `refreshPriority` here. Setting it flips GSAP's internal `_sort`
+         flag, after which every refreshAll() re-sorts the global trigger array
+         underneath triggers that captured their own index at init; one of them
+         then reads `undefined.end` and throws inside a React render, which is
+         what crashed the page on hard refresh. */
       ScrollTrigger.create({
         start: 20,
         end: "max",
         onEnter: () => setScrolled(true),
         onLeaveBack: () => setScrolled(false),
-      });
-
-      /* Which section owns the viewport. Sections live in sibling components, so
-         guard on existence rather than assuming the anchors are mounted.
-
-         NO `refreshPriority` here, deliberately.
-
-         Setting it flips GSAP's internal `_sort` flag, and from then on every
-         refreshAll() calls ScrollTrigger.sort() and REORDERS the global
-         `_triggers` array. Trigger init captures its own position first
-         (`triggerIndex = _triggers.indexOf(self)`) and then walks backwards
-         from it; once the array has been re-sorted underneath that index, the
-         walk reads a slot that no longer holds what it expects, `curTrigger`
-         comes back undefined, and `curTrigger.end` throws:
-
-             TypeError: Cannot read properties of undefined (reading 'end')
-                 at P.refresh  <- recursed
-                 at P.refresh
-                 at t.init
-
-        Thrown inside a React render pass, that hits the error boundary and
-        takes the page down, which is what crashed on hard refresh.
-
-        These triggers only drive which nav pill is highlighted, so refresh
-        order genuinely does not matter for them. */
-      NAV.forEach(({ id }) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        ScrollTrigger.create({
-          trigger: el,
-          start: "top 45%",
-          end: "bottom 45%",
-          onToggle: (self) => self.isActive && setActiveId(id),
-        });
       });
     },
     { scope: headerRef },
@@ -182,8 +280,8 @@ export function SiteHeader() {
     const nav = navRef.current;
     if (!pill || !nav) return;
 
-    const idx = NAV.findIndex((n) => n.id === pillTargetId);
-    const target = idx >= 0 ? linkRefs.current[idx] : null;
+    const idx = pillTargetKey ? PILL_KEYS.indexOf(pillTargetKey) : -1;
+    const target = idx >= 0 ? itemRefs.current[idx] : null;
 
     if (!target) {
       gsap.to([pill, glow].filter(Boolean), {
@@ -221,7 +319,13 @@ export function SiteHeader() {
         overwrite: true,
       });
     }
-  }, [pillTargetId, scrolled]);
+  }, [pillTargetKey, scrolled]);
+
+  /* Close everything on navigation. */
+  useEffect(() => {
+    setOpenMenu(null);
+    setMobileOpen(false);
+  }, [pathname]);
 
   /* Lock body scroll while the mobile sheet is open. */
   useEffect(() => {
@@ -233,128 +337,233 @@ export function SiteHeader() {
     };
   }, [mobileOpen]);
 
+  /* Escape closes whichever menu is open. */
   useEffect(() => {
-    if (!mobileOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    if (!mobileOpen && !openMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMobileOpen(false);
+      setOpenMenu(null);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mobileOpen]);
+  }, [mobileOpen, openMenu]);
+
+  const linkClass = (active: boolean) =>
+    `group/link gsap-h-item relative block rounded-full px-[1rem] py-2 text-[15px] font-bold tracking-[-0.015em] outline-none transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
+      active ? "text-forest-950" : "text-forest-950/65"
+    }`;
+
+  /* Marks the current page — the pill can't, since hover borrows it. */
+  const activeDot = (active: boolean) => (
+    <span
+      aria-hidden
+      className={`absolute bottom-[3px] left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-forest-500 transition-all duration-300 ${
+        active ? "scale-100 opacity-100" : "scale-0 opacity-0"
+      }`}
+    />
+  );
+
+  const closeMobile = () => {
+    setMobileOpen(false);
+    setMobileSection(null);
+  };
 
   return (
     <>
+      <a
+        href="#content"
+        className="sr-only z-[60] rounded-full bg-forest-950 px-4 py-2.5 text-[14px] font-bold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+
       <header
         ref={headerRef}
         /* Sits a little lower at rest so the pill reads as floating inside the
            hero panel, then tucks closer to the edge once docked. */
         className={`fixed inset-x-0 z-50 transition-[top] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          scrolled ? "top-3" : "top-5"
+          scrolled ? "top-3" : "top-4"
         }`}
       >
-        {/* One fixed measure in both scroll states. The width deliberately does
-            not animate: a pill that resizes as you scroll pulls attention back to
-            the chrome, and at full viewport width the nav items strand in the
-            middle with the logo and CTA pinned to far-apart edges.
-
-            The pill is opaque white throughout — it sits over video, where a
-            transparent bar would leave the nav unreadable. Scroll changes only
-            its height and shadow depth. */}
-        <div className="mx-auto max-w-[1080px] px-4">
+        {/* One fixed measure in both scroll states. The pill is opaque white
+            throughout — it sits over video, where a transparent bar would leave
+            the nav unreadable. Scroll changes only its height and shadow. */}
+        <div className="mx-auto max-w-[1120px] px-2.5 min-[381px]:px-4">
           <div
-            className={` relative flex items-center justify-between rounded-[1.35rem] bg-surface transition-[box-shadow,padding] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            className={`relative flex items-center justify-between rounded-[1.35rem] bg-surface transition-[box-shadow,padding] duration-[550ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               scrolled
-                ? "px-3 py-2 shadow-[0_2px_10px_-2px_rgba(6,46,29,0.1),0_18px_44px_-20px_rgba(6,46,29,0.3)] md:px-4"
-                : "px-4 py-3 shadow-[0_2px_8px_-2px_rgba(6,46,29,0.07),0_12px_34px_-18px_rgba(6,46,29,0.22)] md:px-5"
+                ? "px-2.5 py-2 shadow-[0_2px_10px_-2px_rgba(6,46,29,0.1),0_18px_44px_-20px_rgba(6,46,29,0.3)] min-[381px]:px-3 md:px-4"
+                : "px-3 py-2.5 shadow-[0_2px_8px_-2px_rgba(6,46,29,0.07),0_12px_34px_-18px_rgba(6,46,29,0.22)] min-[381px]:px-4 md:px-5"
             }`}
           >
-            <div className="gsap-h-logo relative z-10 flex items-center">
-              <LogoLink height={scrolled ? 30 : 34} className="transition-all duration-500" />
+            {/* Smaller below `sm`, where the bar also carries Start free and the
+                burger. The logo sizes itself inline, hence `!`. */}
+            <div className="gsap-h-logo relative z-10 flex items-center max-sm:[&_img]:h-[26px]! max-sm:[&_img]:w-auto! max-[380px]:[&_img]:h-[22px]!">
+              <LogoLink height={scrolled ? 30 : 32} className="transition-all duration-500" />
             </div>
 
-            {/* ---- desktop nav ---- */}
-            <div
-              ref={navRef}
-              onMouseLeave={() => setHoverId(null)}
-              className="relative z-10 hidden items-center md:flex"
+            {/* ---- desktop nav ----
+                From `lg`: with two dropdowns and two links the row needs the
+                width, and between md and lg it crowded the logo and CTAs. */}
+            <nav
+              aria-label="Main"
+              className="relative z-10 hidden lg:block"
+              onMouseLeave={() => setHoverKey(null)}
             >
-              {/* Underline, not a glow.
-                  A blurred emerald bloom behind a pale wash read as a washed-out
-                  smudge on white — two soft green layers with no hard edge
-                  between them. This is a single crisp bar that slides along the
-                  bottom of the nav, so the indicator has a defined edge and the
-                  green stays fully saturated. */}
-              <span
-                ref={glowRef}
-                aria-hidden
-                className="pointer-events-none absolute bottom-0.5 left-0 h-[2.5px] rounded-full opacity-0"
-                style={{
-                  width: 0,
-                  background:
-                    "linear-gradient(90deg, transparent, var(--forest-500) 22%, var(--forest-400) 50%, var(--forest-500) 78%, transparent)",
-                }}
-              />
-              {/* Neutral capsule behind the hovered label — a faint ink tint
-                  rather than green, so the moving highlight never competes with
-                  the emerald CTA a few pixels to its right. */}
-              <span
-                ref={pillRef}
-                aria-hidden
-                className="pointer-events-none absolute left-0 top-1/2 h-9 -translate-y-1/2 rounded-full bg-forest-950/5.5 opacity-0 ring-1 ring-inset ring-forest-950/4"
-                style={{ width: 0 }}
-              />
-              {NAV.map((item, i) => {
-                const isActive = activeId === item.id;
-                return (
-                  <a
-                    key={item.id}
-                    ref={(el) => {
-                      linkRefs.current[i] = el;
-                    }}
-                    href={sectionHref(item.id)}
-                    onMouseEnter={() => setHoverId(item.id)}
-                    onFocus={() => setHoverId(item.id)}
-                    onBlur={() => setHoverId(null)}
-                    aria-current={isActive ? "true" : undefined}
-                    className={`group/link gsap-h-item relative rounded-full px-[1.15rem] py-2 text-[14.5px] font-bold tracking-[-0.015em] outline-none transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 ${
-                      isActive ? "text-forest-950" : "text-forest-950/65"
-                    }`}
-                  >
-                    {/* No chevron here, unlike the reference: these are
-                        single-destination anchors, and a disclosure arrow that
-                        opens nothing is a broken affordance. */}
-                    <RollingLabel text={item.label} />
-                    {/* Dot marks the section actually in view — the pill can't,
-                        since hover borrows it. */}
-                    <span
-                      aria-hidden
-                      className={`absolute bottom-[3px] left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-forest-500 transition-all duration-300 ${
-                        isActive ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                      }`}
-                    />
-                  </a>
-                );
-              })}
-            </div>
+              <div ref={navRef} className="relative flex items-center">
+                {/* Underline, not a glow: one crisp bar sliding along the bottom
+                    of the nav, so the indicator has a defined edge. */}
+                <span
+                  ref={glowRef}
+                  aria-hidden
+                  className="pointer-events-none absolute bottom-0.5 left-0 h-[2.5px] rounded-full opacity-0"
+                  style={{
+                    width: 0,
+                    background:
+                      "linear-gradient(90deg, transparent, var(--forest-500) 22%, var(--forest-400) 50%, var(--forest-500) 78%, transparent)",
+                  }}
+                />
+                {/* Neutral capsule behind the hovered label — a faint ink tint,
+                    so the moving highlight never competes with the CTA. */}
+                <span
+                  ref={pillRef}
+                  aria-hidden
+                  className="pointer-events-none absolute left-0 top-1/2 h-9 -translate-y-1/2 rounded-full bg-forest-950/5.5 opacity-0 ring-1 ring-inset ring-forest-950/4"
+                  style={{ width: 0 }}
+                />
+
+                <ul className="flex items-center">
+                  {DROPDOWNS.map((menu, i) => {
+                    const open = openMenu === menu.key;
+                    const active = activeKey === menu.key;
+                    return (
+                      <li
+                        key={menu.key}
+                        className="relative"
+                        onMouseEnter={() => {
+                          hoverOpened.current = true;
+                          setOpenMenu(menu.key);
+                        }}
+                        onMouseLeave={() => {
+                          hoverOpened.current = false;
+                          setOpenMenu(null);
+                        }}
+                        onBlur={(e) => {
+                          /* Close once focus leaves the trigger and its card. */
+                          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                            setOpenMenu(null);
+                          }
+                        }}
+                      >
+                        <button
+                          ref={(el) => {
+                            itemRefs.current[i] = el;
+                          }}
+                          type="button"
+                          aria-expanded={open}
+                          aria-controls={`menu-${menu.key}`}
+                          onClick={() => {
+                            if (hoverOpened.current) {
+                              hoverOpened.current = false;
+                              return;
+                            }
+                            setOpenMenu(open ? null : menu.key);
+                          }}
+                          onMouseEnter={() => setHoverKey(menu.key)}
+                          onFocus={() => setHoverKey(menu.key)}
+                          className={`${linkClass(active || open)} flex items-center gap-1`}
+                        >
+                          <RollingLabel text={menu.label} />
+                          <ChevronDown
+                            aria-hidden
+                            className={`h-3.5 w-3.5 transition-transform duration-300 ${
+                              open ? "rotate-180" : ""
+                            }`}
+                          />
+                          {activeDot(active)}
+                        </button>
+
+                        {/* Always in the DOM, `invisible` when shut, so the
+                            links are crawlable and need no mount to open.
+                            `pt-3` bridges the gap to the capsule so the pointer
+                            can cross it without closing the card. */}
+                        <div
+                          id={`menu-${menu.key}`}
+                          className={`absolute left-1/2 top-full ${
+                            menu.columns.length > 1 ? "w-[34rem]" : "w-[19rem]"
+                          } -translate-x-1/2 pt-4 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                            open
+                              ? "visible translate-y-0 opacity-100"
+                              : "invisible -translate-y-1 opacity-0"
+                          }`}
+                        >
+                          <div
+                            className={`grid ${
+                              menu.columns.length > 1 ? "grid-cols-2" : "grid-cols-1"
+                            } gap-2 rounded-[1.35rem] bg-surface p-3 shadow-[0_2px_10px_-2px_rgba(6,46,29,0.12),0_28px_60px_-24px_rgba(6,46,29,0.4)] ring-1 ring-inset ring-forest-950/[0.07]`}
+                          >
+                            {menu.columns.map((column) => (
+                              <div key={column.title}>
+                                <p className="px-3 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-forest-700">
+                                  {column.title}
+                                </p>
+                                {column.links.map((link) => (
+                                  <MenuItem
+                                    key={link.href}
+                                    link={link}
+                                    current={pathname === link.href}
+                                    onNavigate={() => setOpenMenu(null)}
+                                  />
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+
+                  {LINKS.map((item, i) => {
+                    const active = activeKey === item.href;
+                    return (
+                      <li key={item.href}>
+                        <a
+                          ref={(el) => {
+                            itemRefs.current[DROPDOWNS.length + i] = el;
+                          }}
+                          href={item.href}
+                          onMouseEnter={() => setHoverKey(item.href)}
+                          onFocus={() => setHoverKey(item.href)}
+                          onBlur={() => setHoverKey(null)}
+                          aria-current={active ? "page" : undefined}
+                          className={linkClass(active)}
+                        >
+                          <RollingLabel text={item.label} />
+                          {activeDot(active)}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </nav>
 
             {/* ---- actions ---- */}
             <div className="relative z-10 flex items-center gap-1.5">
-              {/* `#start`, not `#signin`: there is no sign-in route in this
-                  project, and an anchor to an ID that does not exist is a link
-                  that visibly does nothing when clicked. */}
               <MagneticButton
                 as="a"
                 href={APP_URL}
                 {...EXTERNAL_LINK_PROPS}
                 variant="ghost"
                 size="sm"
-                /* `md`, not `sm`, to match the CTA beside it and the burger's own
-                   `md:hidden`. At sm this appeared alongside the hamburger, so
-                   the bar showed a nav link and the menu that duplicates it. One
-                   breakpoint now switches the whole action cluster at once. */
-                className="gsap-h-item hidden md:inline-flex"
+                className="gsap-h-item hidden lg:inline-flex"
               >
                 Sign in
               </MagneticButton>
 
+              {/* Visible at every width, per the Navigation Spec: on mobile the
+                  primary CTA stays beside the burger. */}
               <MagneticButton
                 as="a"
                 href={APP_URL}
@@ -362,17 +571,13 @@ export function SiteHeader() {
                 variant="ink"
                 size="sm"
                 roll={false}
-                /* Hidden below md, where the hamburger appears: the mobile sheet
-                   already carries its own "Start free" (and "Sign in"), so this
-                   was a duplicate CTA competing with the burger for the narrow
-                   strip beside the logo and crowding the bar. */
-                className="gsap-h-item group hidden md:inline-flex"
+                className="gsap-h-item group inline-flex whitespace-nowrap max-[380px]:h-9 max-[380px]:px-3.5 max-[380px]:text-[13px]"
               >
                 Start free
                 {/* Diagonal arrow that exits top-right and re-enters from
                     bottom-left, so the loop reads as "launch" rather than a
-                    nudge. Overflow-hidden on the well does the clipping. */}
-                <span className="relative grid h-4 w-4 place-items-center overflow-hidden">
+                    nudge. Dropped below 400px, where the bar has no room. */}
+                <span className="relative hidden h-4 w-4 place-items-center overflow-hidden min-[400px]:grid">
                   <ArrowUpRight className="h-4 w-4 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-4 group-hover:-translate-y-4" />
                   <ArrowUpRight className="absolute h-4 w-4 -translate-x-4 translate-y-4 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:translate-y-0" />
                 </span>
@@ -380,10 +585,11 @@ export function SiteHeader() {
 
               <button
                 type="button"
-                onClick={() => setMobileOpen((v) => !v)}
+                onClick={() => (mobileOpen ? closeMobile() : setMobileOpen(true))}
                 aria-label={mobileOpen ? "Close menu" : "Open menu"}
                 aria-expanded={mobileOpen}
-                className="gsap-h-item ml-0.5 grid h-10 w-10 place-items-center rounded-full text-forest-950 ring-1 ring-inset ring-forest-900/12 transition-colors duration-300 hover:bg-forest-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 md:hidden"
+                aria-controls="mobile-menu"
+                className="gsap-h-item ml-0.5 grid h-10 w-10 place-items-center max-[380px]:h-9 max-[380px]:w-9 rounded-full text-forest-950 ring-1 ring-inset ring-forest-900/12 transition-colors duration-300 hover:bg-forest-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500 lg:hidden"
               >
                 {mobileOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
               </button>
@@ -392,54 +598,102 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* ---- mobile sheet ---- */}
+      {/* ---- mobile sheet ----
+          The same links as the desktop menu, in the same groups. Stays in the
+          DOM when shut (hidden, `inert`), so the links are in the HTML Google's
+          mobile crawler reads. */}
       <div
-        className={`fixed inset-0 z-40 md:hidden ${mobileOpen ? "" : "pointer-events-none"}`}
+        id="mobile-menu"
+        className={`fixed inset-0 z-40 lg:hidden ${mobileOpen ? "" : "pointer-events-none"}`}
         aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
       >
         <div
-          onClick={() => setMobileOpen(false)}
+          onClick={closeMobile}
           className={`absolute inset-0 bg-forest-950/30 backdrop-blur-sm transition-opacity duration-500 ${
             mobileOpen ? "opacity-100" : "opacity-0"
           }`}
         />
         <div
-          className={`absolute inset-x-3 top-20 origin-top rounded-[1.75rem] bg-[color-mix(in_oklab,var(--surface)_84%,var(--forest-500))]/92 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_28px_70px_-28px_rgba(6,46,29,0.4)] ring-1 ring-inset ring-forest-900/12 backdrop-blur-2xl backdrop-saturate-[1.7] transition-all duration-[480ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute inset-x-3 top-20 max-h-[calc(100svh-6rem)] origin-top overflow-y-auto rounded-[1.75rem] bg-surface p-3 shadow-[0_28px_70px_-28px_rgba(6,46,29,0.4)] ring-1 ring-inset ring-forest-900/12 transition-all duration-[480ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
             mobileOpen
               ? "translate-y-0 scale-100 opacity-100"
               : "-translate-y-3 scale-[0.97] opacity-0"
           }`}
         >
-          <nav className="flex flex-col">
-            {NAV.map((item, i) => (
-              <a
-                key={item.id}
-                href={sectionHref(item.id)}
-                onClick={() => setMobileOpen(false)}
-                style={{ transitionDelay: mobileOpen ? `${90 + i * 50}ms` : "0ms" }}
-                className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-[16px] font-bold tracking-[-0.015em] text-forest-950 transition-all duration-500 active:bg-forest-950/5 ${
-                  mobileOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-                } ${activeId === item.id ? "bg-forest-950/5" : ""}`}
-              >
-                {item.label}
-                <ArrowRight className="h-4 w-4 text-forest-700/40" />
-              </a>
-            ))}
+          <nav aria-label="Main mobile" className="flex flex-col">
+            {DROPDOWNS.map((menu) => {
+              const open = mobileSection === menu.key;
+              return (
+                <div key={menu.key}>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={`mobile-${menu.key}`}
+                    onClick={() => setMobileSection(open ? null : menu.key)}
+                    className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[16px] font-bold tracking-[-0.015em] text-forest-950 active:bg-forest-950/5"
+                  >
+                    {menu.label}
+                    <ChevronDown
+                      aria-hidden
+                      className={`h-4 w-4 text-forest-700/60 transition-transform duration-300 ${
+                        open ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  <div
+                    id={`mobile-${menu.key}`}
+                    className="grid transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+                  >
+                    <div className="overflow-hidden" inert={!open}>
+                      <div className="pb-2">
+                        {menu.columns
+                          .flatMap((c) => c.links)
+                          .map((link) => (
+                            <MenuItem
+                              key={link.href}
+                              link={link}
+                              current={pathname === link.href}
+                              onNavigate={closeMobile}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            <ul>
+              {LINKS.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    onClick={closeMobile}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-[16px] font-bold tracking-[-0.015em] text-forest-950 active:bg-forest-950/5 ${
+                      pathname === item.href ? "bg-forest-950/5" : ""
+                    }`}
+                  >
+                    {item.label}
+                    <ArrowRight aria-hidden className="h-4 w-4 text-forest-700/40" />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
           <div className="mt-2 flex flex-col gap-2 border-t border-forest-900/10 pt-3">
-            {/* `#start` for the same reason as the desktop button above. */}
             <MagneticButton
               as="a"
               href={APP_URL}
               {...EXTERNAL_LINK_PROPS}
               variant="outline"
               size="md"
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMobile}
             >
               Sign in
             </MagneticButton>
-            {/* Matches the desktop CTA's ink face — the sheet is white, so the
-                same reasoning applies: chrome, not the hero's emerald. */}
             <MagneticButton
               as="a"
               href={APP_URL}
@@ -447,7 +701,7 @@ export function SiteHeader() {
               variant="ink"
               size="md"
               roll={false}
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMobile}
             >
               Start free
               <ArrowRight className="h-4 w-4" />

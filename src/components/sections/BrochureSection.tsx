@@ -134,7 +134,7 @@ export default function BrochureSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".br-eyebrow, .br-heading, .br-sub, .br-cta, .br-spec, .br-cover, .br-mascot", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });

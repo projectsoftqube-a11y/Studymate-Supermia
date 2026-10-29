@@ -9,55 +9,38 @@ import { refreshAfterFonts } from "@/lib/scroll-refresh";
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 
 /**
- * The questions a visitor actually has at this point in the page, ordered by
- * when they surface rather than by topic.
+ * The homepage's five-question preview, verbatim from the content package.
  *
- * Every answer is drawn from something the page itself demonstrates further up:
- * the five setup steps in How It Works, the syllabus lock, the three practice
- * levels in the quiz, the instant evaluation, the chapter reports. Nothing here
- * introduces a capability the reader has not already been shown, and nothing
- * claims a certification, an adoption figure, a price or a third-party
- * endorsement, because those are claims about the outside world that this page
- * cannot substantiate.
+ * Ordered by when the doubt surfaces: what it is, whether books must be
+ * uploaded, how it differs from a chatbot, whether it hands over answers, and
+ * what it costs to start. The fourth carries the most weight: "Will it just
+ * give my child the answers?" is the biggest objection a parent has about AI
+ * study tools, and answering it honestly is a differentiator.
  *
- * Deliberately absent: pricing and data-privacy answers. Both were removed
- * because the figures in them were not settled. An FAQ that states a wrong
- * price or an unverified compliance posture is worse than no answer at all.
- *
- * The fourth question carries the most weight. "Will it just give my child the
- * answers?" is the single biggest objection a parent has about AI study tools,
- * and answering it honestly is a genuine differentiator rather than a defensive
- * note. It is placed mid-list, where it reads as a fair question being
- * addressed rather than as a rebuttal the page is anxious about.
+ * Visible only. The full set of 23 answers, and the site's only FAQPage markup,
+ * live on /faq. The package keeps FAQPage on one page so the same questions are
+ * not marked up twice across the site.
  */
 const FAQS = [
   {
-    q: "Do I need to upload my textbooks?",
-    a: "No. Your books are already in the library, processed and ready. You pick your country, board and standard once when you set up, and the right textbooks are waiting on your shelf. Any chapter is searchable from the moment you open it, so there is nothing to scan, upload or wait for.",
+    q: "What is StudyMate AI?",
+    a: "StudyMate AI is an AI tutor for school students from SuperMIA. It answers questions from the student's own syllabus textbook with the page cited, adapts practice to their level, generates chapter practice papers with instant evaluation and shows which chapters to study next.",
   },
   {
-    q: "How is this different from asking a general AI chatbot?",
-    a: "A general chatbot answers from the internet and does not know which syllabus you are on. StudyMate answers from the chapter in front of you. You set your board and standard during setup, and every answer, test and report afterwards stays inside that syllabus rather than drifting into material you will never be examined on.",
+    q: "Do we need to upload textbooks?",
+    a: "No. Choose the country, board and class once at setup and the matching textbooks appear on the bookshelf. Any chapter can be searched as soon as it is opened.",
   },
   {
-    q: "What does the adaptive tutoring actually change?",
-    a: "The pace and the difficulty. Ask a question in plain language and the session re-paces itself around what you have already shown you know, so you are not walked through basics you have cleared. Practice runs through three levels: whether you know a concept, whether you can use it, and whether you can reason about it.",
+    q: "How is it different from a general AI chatbot?",
+    a: "A general chatbot draws on the internet and doesn't know the syllabus. StudyMate answers from the chapter that is open, within the board and class chosen at setup, so answers, tests and reports stay inside the syllabus.",
   },
   {
     q: "Will it just give my child the answers?",
-    a: "No, and this is the difference that matters most. StudyMate works a topic through with the student and then tests them on it. A wrong answer changes what comes next rather than being corrected and forgotten. The reports show where the understanding is thin, which is information a student cannot get by copying an answer.",
+    a: "No. StudyMate works through a topic with the student and then tests them. A wrong answer shapes what comes next, and the progress report shows where understanding is still thin.",
   },
   {
-    q: "How do the tests and evaluation work?",
-    a: "Generate a paper from any chapter you choose, at the difficulty you choose, and attempt it online. Evaluation is instant and detailed, not just a score.",
-  },
-  {
-    q: "What do the progress reports tell me?",
-    a: "Which chapters you have covered and how you actually performed in each. The point is not the score on its own, it is knowing which chapters still need work before an exam, so revision time goes to the topics that will move your marks rather than the ones that already feel comfortable.",
-  },
-  {
-    q: "How long does it take to get started?",
-    a: "About five minutes, in a single sitting. One form to create your account, pick your country, board and standard, open your bookshelf, work through a topic, then take a test and see the gaps. Nothing to install and no manual to read.",
+    q: "How much does it cost to start?",
+    a: "New accounts start with 5,000 free credits and no card is required. Setup takes about five minutes and there is nothing to install.",
   },
 ] as const;
 
@@ -69,11 +52,8 @@ const FAQS = [
  * of those doubts is a reason not to click, so they are answered here rather
  * than left to the reader.
  *
- * SEO: this is the page's best remaining structured-data opportunity. FAQPage
- * markup lets search engines render these questions directly in results, and the
- * questions themselves carry the long-tail queries no other section can ("is it
- * free", "does it work with CBSE", "will it do my homework for me") which are
- * lower competition and higher intent than anything the hero targets.
+ * Every answer is in the server HTML on first load: collapsed rows animate
+ * their height to zero, but the text is rendered, not fetched on open.
  *
  * Design: a two-column split. Questions on the left as a real accordion, and a
  * persistent card on the right that keeps the offer in view while the reader
@@ -135,7 +115,7 @@ export default function FAQSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".fq-eyebrow, .fq-heading, .fq-sub, .fq-item", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });
@@ -143,26 +123,8 @@ export default function FAQSection() {
     { scope: rootRef },
   );
 
-  /* FAQPage structured data, derived from the same array the page renders so the
-     two can never disagree. Search engines can surface these directly in
-     results, which is the highest-value markup left on this page. */
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map(({ q, a }) => ({
-      "@type": "Question",
-      name: q,
-      acceptedAnswer: { "@type": "Answer", text: a },
-    })),
-  };
-
   return (
     <section ref={rootRef} id="faq" className="relative isolate z-30 p-2 sm:p-3">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-      />
-
       {/* Its own white panel, inset like the other sections, rather than sitting
           directly on the page wash. Gives the block an edge so it reads as a
           closing chapter instead of running straight into the footer. */}
@@ -212,14 +174,22 @@ export default function FAQSection() {
               </span>
 
               <h2 className="fq-heading mt-6 text-balance font-display text-[clamp(1.65rem,7vw,3.25rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-forest-950">
-                <span className="block">Before you start,</span>
+                <span className="block">StudyMate AI</span>{" "}
                 <span className="font-hand mt-1 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-600">
-                  the honest answers
+                  FAQs
                 </span>
               </h2>
 
               <p className="fq-sub mx-auto mt-6 max-w-lg text-pretty text-[1.0625rem] leading-relaxed text-forest-950/70">
-                The things people ask us most, answered plainly.
+                Five quick answers. The full list, covering textbooks, tests, credits and data, is
+                on the{" "}
+                <a
+                  href="/faq"
+                  className="font-bold text-forest-700 underline decoration-forest-500/40 decoration-2 underline-offset-[3px] transition-colors duration-300 hover:text-forest-600 hover:decoration-forest-500"
+                >
+                  FAQ page
+                </a>
+                .
               </p>
             </div>
 
@@ -236,12 +206,15 @@ export default function FAQSection() {
                   the previous version read as machine-made. This drops all three:
                   no box, no accent bar, no badge. What is left is a hairline
                   rule per row and generous space, so the type does the work. */}
-              <dl className="mt-12">
+              {/* Each question is an <h3> wrapping its button (the WAI accordion
+                  pattern), so the page outline lists the questions. A <dl> could
+                  not hold them: headings are not allowed inside a <dt>. */}
+              <div className="mt-12">
                 {FAQS.map(({ q, a }, i) => {
                   const isOpen = open === i;
                   return (
                     <div key={q} className="fq-item border-t border-forest-950/10 last:border-b">
-                      <dt>
+                      <h3>
                         <button
                           type="button"
                           onClick={() => setOpen(isOpen ? null : i)}
@@ -251,14 +224,17 @@ export default function FAQSection() {
                           {/* Plain tabular index, no badge. Aligned on the text
                               baseline rather than boxed, so it reads as a figure
                               in a contents page. */}
+                          {/* Drawn with `::before` from a data attribute, not
+                              as text: inside the <h3> a text node would make
+                              the heading read "01 What is StudyMate AI?" to
+                              crawlers and screen readers. */}
                           <span
                             aria-hidden
-                            className={`w-6 shrink-0 font-numeric text-[12px] font-bold tabular-nums transition-colors duration-300 ${
+                            data-index={String(i + 1).padStart(2, "0")}
+                            className={`w-6 shrink-0 font-numeric text-[12px] font-bold tabular-nums transition-colors duration-300 before:content-[attr(data-index)] ${
                               isOpen ? "text-forest-600" : "text-forest-950/25"
                             }`}
-                          >
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
+                          />
 
                           <span
                             className={`flex-1 font-display text-[1.0625rem] font-extrabold leading-snug tracking-[-0.02em] transition-colors duration-300 sm:text-[1.2rem] ${
@@ -283,12 +259,12 @@ export default function FAQSection() {
                             <ChevronDown className="h-[18px] w-[18px]" />
                           </span>
                         </button>
-                      </dt>
+                      </h3>
 
                       {/* `grid-template-rows` 0fr -> 1fr animates to the content's
                           natural height, which a max-height guess cannot do
                           without clipping the longer answers. */}
-                      <dd
+                      <div
                         className="grid transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]"
                         style={{
                           gridTemplateRows: isOpen ? "1fr" : "0fr",
@@ -302,11 +278,11 @@ export default function FAQSection() {
                             {a}
                           </p>
                         </div>
-                      </dd>
+                      </div>
                     </div>
                   );
                 })}
-              </dl>
+              </div>
             </div>
           </div>
         </div>

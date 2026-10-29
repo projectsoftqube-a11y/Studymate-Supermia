@@ -1,4 +1,8 @@
+# studymate.supermia.ai
 User-agent: *
 Allow: /
 
 Sitemap: https://studymate.supermia.ai/sitemap.xml
+
+# The app lives on app.studymate.supermia.ai: serve "X-Robots-Tag: noindex, nofollow"
+# on every response from that host instead of blocking it in robots.txt.

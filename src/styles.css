@@ -275,3 +275,58 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* FAQ accordion: native <details> that slides open and shut.
+   `interpolate-size` lets `block-size` animate to `auto`, and the
+   ::details-content transition keeps the panel rendering while it closes.
+   Browsers without either simply snap, with every answer still in the HTML.
+   The answer itself fades down into place as its row opens. */
+.faq-item {
+  interpolate-size: allow-keywords;
+}
+.faq-item::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    content-visibility 0.5s allow-discrete;
+}
+.faq-item[open]::details-content {
+  block-size: auto;
+}
+.faq-item[open] .faq-answer {
+  animation: sm-faq-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes sm-faq-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-item::details-content {
+    transition: none;
+  }
+}
+
+/* Pointer cursor on everything clickable. Tailwind 4 resets buttons to the
+   default cursor, so it is restored here once, in the base layer, where any
+   `cursor-*` utility on an element still wins. */
+@layer base {
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  [role="link"],
+  summary,
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="submit"],
+  input[type="button"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}

@@ -1,25 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LegalPage from "@/components/legal/LegalPage";
 import { PRIVACY_DOC, TERMS_DOC } from "@/content/legal";
-import { SITE_URL } from "@/lib/site";
+import { PAGES } from "@/content/pages";
+import { pageHead } from "@/lib/seo";
 
-/** See `privacy.tsx` for why the canonical link is declared per route. */
+/** See `privacy.tsx`. The registry entry explains the "Security Policy" title. */
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms & Conditions | StudyMate AI" },
-      { name: "description", content: TERMS_DOC.description },
-      { property: "og:title", content: "Terms & Conditions | StudyMate AI" },
-      { property: "og:description", content: TERMS_DOC.description },
-      { property: "og:url", content: `${SITE_URL}${TERMS_DOC.path}` },
-      { name: "twitter:title", content: "Terms & Conditions | StudyMate AI" },
-      { name: "twitter:description", content: TERMS_DOC.description },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}${TERMS_DOC.path}` }],
-  }),
+  head: () => pageHead(PAGES.terms),
   component: TermsRoute,
 });
 
 function TermsRoute() {
-  return <LegalPage doc={TERMS_DOC} other={PRIVACY_DOC} />;
+  return <LegalPage page={PAGES.terms} doc={TERMS_DOC} other={PRIVACY_DOC} />;
 }

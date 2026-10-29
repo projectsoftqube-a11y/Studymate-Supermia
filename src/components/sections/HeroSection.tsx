@@ -169,7 +169,7 @@ export default function HeroSection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".hero-award, .hero-headline, .hero-sub, .hero-cta, .hero-strip", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });
@@ -338,8 +338,10 @@ export default function HeroSection() {
                       "linear-gradient(90deg, transparent, color-mix(in oklab, var(--forest-300) 65%, transparent))",
                   }}
                 />
+                {/* The brand line the content package asks for above the H1, so
+                    the H1 itself can lead on what people search for. */}
                 <span className="text-[11px] font-bold uppercase tracking-[0.34em] text-forest-300">
-                  AI Tutoring Agent
+                  StudyMate AI by SuperMIA
                 </span>
                 <span
                   aria-hidden
@@ -379,20 +381,27 @@ export default function HeroSection() {
               className="hero-headline mt-6 max-w-5xl text-balance font-display text-[clamp(1.85rem,7.5vw,4.75rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-white sm:mt-8"
               style={{ textShadow: "0 2px 34px rgba(3,26,16,0.55), 0 1px 3px rgba(3,26,16,0.4)" }}
             >
-              Your AI tutor that turns any textbook into{" "}
-              {/* Kalam, the brand's handwritten face, marks the payoff word — the
-                one a teacher would have circled. font-bold (700) not 800: Kalam
-                ships only 400/700, and 800 forces a synthesized fake bold. */}
+              {/* Leads on "AI tutor for students", the term this page owns
+                  (390/mo US). The previous "Your AI tutor that turns any
+                  textbook into real understanding" read well but buried it. */}
+              The AI Tutor for Students That Answers From{" "}
+              {/* Kalam, the brand's handwritten face, marks the payoff words —
+                the ones a teacher would have circled. font-bold (700) not 800:
+                Kalam ships only 400/700, and 800 forces a synthesized fake bold. */}
               <span className="font-hand inline-block pr-[0.06em] text-[1.1em] font-bold leading-[0.9] text-forest-300">
-                real understanding
+                Their Own Textbooks
               </span>
             </h1>
 
-            {/* Wider measure than the old max-w-2xl so this also lands in two
-                lines on desktop and reads as one statement, not a paragraph. */}
-            <p className="hero-sub mt-5 max-w-3xl text-pretty text-[1.03125rem] leading-relaxed text-white/80 sm:mt-7 sm:text-[1.25rem]">
-              Open your textbook, chat through any chapter, and practise with AI-generated tests
-              that adapt to you, with analytics that show exactly where you stand.
+            {/* The page's answer block: a self-contained definition of the
+                product directly under the H1, which is the passage search and
+                answer engines lift. Wider measure than the old max-w-2xl so it
+                reads as one statement rather than a narrow column. */}
+            <p className="hero-sub answer-block mt-5 max-w-3xl text-pretty text-[1rem] leading-relaxed text-white/80 sm:mt-7 sm:text-[1.15rem]">
+              StudyMate AI is an AI tutor for school students that answers from their own syllabus
+              textbooks, with the page cited. Adaptive practice tests match their level, and a
+              progress report shows which chapters to revise before exams.{" "}
+              <span className="text-white/60">It explains, never hands over answers.</span>
             </p>
 
             <div className="mt-7 flex flex-col items-center gap-3 sm:mt-9 sm:flex-row">
@@ -400,13 +409,13 @@ export default function HeroSection() {
                 <MagneticButton
                   as="a"
                   href={APP_URL}
-              {...EXTERNAL_LINK_PROPS}
+                  {...EXTERNAL_LINK_PROPS}
                   variant="solid"
                   size="lg"
                   roll={false}
                   className="group"
                 >
-                  Start learning free
+                  Start free
                   <span className="relative grid h-5 w-5 place-items-center overflow-hidden">
                     <ArrowUpRight className="h-5 w-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-5 group-hover:-translate-y-5" />
                     <ArrowUpRight className="absolute h-5 w-5 -translate-x-5 translate-y-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:translate-y-0" />
@@ -425,16 +434,22 @@ export default function HeroSection() {
                   variant="glass"
                   size="lg"
                   roll={false}
-                  className="group"
+                  className="group whitespace-nowrap max-[400px]:px-5 max-[400px]:text-[15px]"
                 >
                   <span className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-white transition-all duration-300 group-hover:scale-110 group-hover:bg-forest-500">
                     <Sparkles className="h-3.5 w-3.5" />
                   </span>
-                  Try a sample test
-                  <span className="text-white/50">2 min</span>
+                  Try a sample question
+                  {/* Dropped below 400px, where the label alone fills the button. */}
+                  <span className="hidden text-white/50 min-[400px]:inline">2 min</span>
                 </MagneticButton>
               </span>
             </div>
+
+            <p className="hero-cta mt-5 text-[13px] font-semibold text-white/60">
+              <span className="font-numeric font-extrabold text-forest-300">5,000</span> free
+              credits to start. No card required.
+            </p>
           </div>
         </div>
 

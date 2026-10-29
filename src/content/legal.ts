@@ -53,8 +53,6 @@ export interface LegalDoc {
   updatedISO: string;
   /** Opening paragraph, set larger than body copy and outside the numbered sections. */
   intro: string;
-  /** `<meta name="description">` for the route. */
-  description: string;
   sections: LegalSection[];
 }
 
@@ -64,8 +62,6 @@ export const PRIVACY_DOC: LegalDoc = {
   eyebrow: "Legal",
   updated: "August 10, 2026",
   updatedISO: "2026-08-10",
-  description:
-    "How StudyMate collects, uses, discloses and safeguards your information — the personal, educational and usage data we hold, who we share it with, and how to contact us about it.",
   intro:
     "Welcome to StudyMate. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our application and use our services. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.",
   sections: [
@@ -188,8 +184,6 @@ export const TERMS_DOC: LegalDoc = {
   eyebrow: "Legal",
   updated: "August 10, 2026",
   updatedISO: "2026-08-10",
-  description:
-    "The Terms of Security and Service governing StudyMate — account and authentication security, acceptable use, AI-generated content, and the conditions under which accounts may be suspended.",
   intro:
     "Welcome to StudyMate. By accessing or using our application, APIs, and associated services, you agree to be bound by these Terms of Security and Service. If you do not agree, please do not use the application.",
   sections: [

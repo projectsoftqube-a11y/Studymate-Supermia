@@ -159,7 +159,7 @@ export default function ChatTextbookSection() {
            point and a person who asked for less motion still needs to read it. */
         gsap.set(
           ".ct-window, .ct-source, .ct-question, .ct-answer-head, .ct-intro, .ct-prop, .ct-cite, .ct-follow, .ct-claims li, .ct-note",
-          { clearProps: "all", opacity: 1 },
+          { clearProps: "opacity,transform,visibility,filter", opacity: 1 },
         );
         gsap.set(".ct-thinking", { display: "none" });
         setDone(true);
@@ -230,15 +230,16 @@ export default function ChatTextbookSection() {
             </span>
 
             <h2 className="ct-heading mt-6 text-balance font-display text-[clamp(1.65rem,7vw,3.4rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-white">
-              <span className="block">Stuck on a chapter?</span>
+              <span className="block">Answers From the Chapter,</span>{" "}
               <span className="font-hand mt-1 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-300">
-                Just ask the book
+                With the Page Cited
               </span>
             </h2>
 
             <p className="ct-sub mt-6 max-w-md text-pretty text-[1.0625rem] leading-relaxed text-white/65">
-              StudyMate answers from the chapter in front of you and shows you the page it came
-              from, so you can always check for yourself.
+              A general chatbot draws on the internet and doesn't know the syllabus. StudyMate
+              answers from the chapter the student has open, within the board and class set at
+              setup, so the explanation matches the textbook for that board and class.
             </p>
 
             {/* Three claims the transcript then proves. Stating them beside the
@@ -246,9 +247,9 @@ export default function ChatTextbookSection() {
                 for while the reply types itself out. */}
             <ul className="ct-claims mt-8 space-y-3">
               {[
-                "Answers in plain language, not textbook language",
-                "Every answer cites the page it came from",
-                "Ask follow-ups until it actually clicks",
+                "Plain-language explanations of any concept in the chapter",
+                "The page cited with answers, so the student can go back to the book and check",
+                "Follow-ups until it clicks: an example, a simpler explanation or a quick quiz on the same idea",
               ].map((c) => (
                 <li key={c} className="flex items-start gap-3">
                   <span
@@ -273,10 +274,23 @@ export default function ChatTextbookSection() {
                 </span>
               </div>
               <p className="mt-2.5 text-[13.5px] leading-relaxed text-white/60">
-                StudyMate walks you through the reasoning instead of handing over a finished answer,
-                so the next question gets easier rather than harder.
+                StudyMate is built to teach. It walks through the reasoning instead of handing over
+                a finished answer.
               </p>
             </div>
+
+            {/* Contextual link to the page that owns "textbook ai", with the
+                keyword as its anchor text. */}
+            <p className="ct-note mt-6 text-[14px] leading-relaxed text-white/65">
+              See how StudyMate&apos;s{" "}
+              <a
+                href="/features/chat-with-your-textbook"
+                className="font-bold text-forest-300 underline decoration-forest-300/40 decoration-2 underline-offset-[3px] transition-colors duration-300 hover:text-white hover:decoration-white/60"
+              >
+                textbook AI
+              </a>{" "}
+              answers from the open chapter.
+            </p>
           </div>
 
           {/* ---------- the transcript ---------- */}
@@ -306,8 +320,11 @@ export default function ChatTextbookSection() {
                     Chapter 1 · Rational Numbers
                   </span>
                 </span>
-                <span className="ml-auto hidden shrink-0 rounded-full bg-forest-500/10 px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] text-forest-700 sm:block">
-                  Your book
+                {/* "Sample", not "Your book": this is a demonstration exchange,
+                    and the package requires every demo on the page to say so.
+                    Visible at every width, not just from `sm`. */}
+                <span className="ml-auto shrink-0 rounded-full bg-forest-500/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-forest-700">
+                  Sample
                 </span>
               </div>
 
@@ -355,7 +372,7 @@ export default function ChatTextbookSection() {
                     <ol className="mt-4 space-y-3.5">
                       {PROPERTIES.map(({ name, body }, i) => (
                         <li key={name} className="ct-prop flex gap-3">
-                          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-forest-600 font-numeric text-[10.5px] font-extrabold text-white">
+                          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-forest-600 font-numeric text-[11px] font-extrabold text-white">
                             {i + 1}
                           </span>
                           <span className="min-w-0">

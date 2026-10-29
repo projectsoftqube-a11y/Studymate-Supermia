@@ -374,10 +374,13 @@ export default function AdaptiveSection() {
            in the dependency-driven hooks below, outside this matchMedia. Those
            hooks are NOT gated on reduced motion, so without resetting them here
            the quiz body and question card could be left at opacity 0. */
-        gsap.set(".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card, .ad-mascot", {
-          clearProps: "all",
-          opacity: 1,
-        });
+        gsap.set(
+          ".ad-eyebrow, .ad-heading, .ad-sub, .ad-panel, .ad-rung, .ad-body, .ad-card, .ad-mascot",
+          {
+            clearProps: "opacity,transform,visibility,filter",
+            opacity: 1,
+          },
+        );
       });
     },
     { scope: rootRef },
@@ -498,17 +501,129 @@ export default function AdaptiveSection() {
           </span>
 
           <h2 className="ad-heading mt-6 text-balance font-display text-[clamp(1.65rem,7vw,3.5rem)] font-extrabold leading-[1.04] tracking-[-0.04em] text-forest-950">
-            <span className="block">It gets harder</span>
+            <span className="block">Practice That Steps Up</span>{" "}
             <span className="font-hand mt-1 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-600">
-              only when you're ready
+              Only When They&apos;re Ready
             </span>
           </h2>
 
           <p className="ad-sub mx-auto mt-6 max-w-xl text-pretty text-[1.0625rem] leading-relaxed text-forest-950/70">
-            Take the test yourself. Answer correctly and the next question steps up. Get one wrong
-            and StudyMate explains it, then steps back.
+            StudyMate&apos;s adaptive tutoring changes the pace and the difficulty. It skips basics
+            a student has already cleared and spends the time on what they haven&apos;t mastered
+            yet.
           </p>
         </div>
+
+        {/* The three levels as text, not only as the strip inside the quiz:
+            the strip is interactive UI, and the definitions are the claim.
+            Drawn as a staircase (each card a step higher from sm) so the
+            layout itself says "harder only as they climb". */}
+        <dl className="ad-sub mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-3 sm:mt-14 sm:grid-cols-3 sm:items-end sm:gap-4">
+          {[
+            ["Basic", "Does the student know the concept?", "sm:min-h-[8.5rem]"],
+            ["Medium", "Can they use it?", "sm:min-h-[10.5rem]"],
+            ["Advanced", "Can they reason with it?", "sm:min-h-[12.5rem]"],
+          ].map(([term, text, height], i) => {
+            const top = i === 2;
+            return (
+              <div
+                key={term}
+                className={`relative flex flex-col justify-between gap-5 overflow-hidden rounded-[1.35rem] p-5 text-left ring-1 ring-inset sm:p-6 ${height} ${
+                  top ? "text-white ring-white/10" : "bg-surface ring-forest-950/[0.08]"
+                }`}
+                style={
+                  top
+                    ? {
+                        background:
+                          "radial-gradient(120% 120% at 0% 0%, var(--forest-700), var(--forest-950) 70%)",
+                        boxShadow: "0 24px 48px -24px rgba(6,46,29,0.55)",
+                      }
+                    : {
+                        boxShadow:
+                          "0 1px 2px rgba(16,40,28,0.04), 0 16px 36px -24px rgba(16,40,28,0.25)",
+                      }
+                }
+              >
+                <div className="flex items-center justify-between">
+                  <dt
+                    className={`text-[11px] font-bold uppercase tracking-[0.2em] ${
+                      top ? "text-forest-300" : "text-forest-700"
+                    }`}
+                  >
+                    <span className="sr-only">Level {i + 1}: </span>
+                    {term}
+                  </dt>
+                  {/* Difficulty meter: one, two, three bars lit. */}
+                  <span aria-hidden className="flex items-end gap-1">
+                    {[0, 1, 2].map((b) => (
+                      <span
+                        key={b}
+                        className={`w-1.5 rounded-full ${
+                          b <= i
+                            ? top
+                              ? "bg-forest-300"
+                              : "bg-forest-600"
+                            : top
+                              ? "bg-white/15"
+                              : "bg-forest-950/10"
+                        }`}
+                        style={{ height: `${8 + b * 5}px` }}
+                      />
+                    ))}
+                  </span>
+                </div>
+                <dd
+                  className={`font-display text-[1.15rem] font-extrabold leading-[1.2] tracking-[-0.02em] sm:text-[1.25rem] ${
+                    top ? "text-white" : "text-forest-950"
+                  }`}
+                >
+                  {text}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+
+        {/* How the level moves: the two rules side by side, then the result. */}
+        <div className="ad-sub mx-auto mt-4 grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          {[
+            {
+              Icon: Check,
+              tone: "bg-forest-600 text-white",
+              text: "A correct answer moves the next question up a level.",
+            },
+            {
+              Icon: RotateCcw,
+              tone: "bg-forest-950 text-forest-300",
+              text: "A wrong answer brings a short explanation and steps the difficulty back down.",
+            },
+          ].map(({ Icon, tone, text }) => (
+            <p
+              key={text}
+              className="flex items-center gap-3.5 rounded-2xl bg-forest-500/[0.06] px-4 py-3.5 text-left text-[15px] font-semibold leading-snug text-forest-950/85 ring-1 ring-inset ring-forest-700/10"
+            >
+              <span
+                aria-hidden
+                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${tone}`}
+              >
+                <Icon className="h-4 w-4" strokeWidth={2.6} />
+              </span>
+              {text}
+            </p>
+          ))}
+        </div>
+
+        <p className="ad-sub mx-auto mt-6 max-w-2xl text-pretty text-center text-[1rem] leading-relaxed text-forest-950/65">
+          That way a mistake shapes what comes next instead of being corrected and forgotten. Try
+          the sample question below, or read more about{" "}
+          <a
+            href="/features/adaptive-tutoring"
+            className="font-bold text-forest-700 underline decoration-forest-500/40 decoration-2 underline-offset-[3px] transition-colors duration-300 hover:text-forest-600 hover:decoration-forest-500"
+          >
+            adaptive learning AI
+          </a>{" "}
+          in StudyMate.
+        </p>
 
         {/* ---------- the ladder ---------- */}
         {/* One panel, not two columns.
@@ -543,7 +658,7 @@ export default function AdaptiveSection() {
             {/* ---- difficulty strip ----
                 Horizontal and segmented, so three levels read as a progress bar
                 rather than as a list with room left over. */}
-            <div className="relative border-b border-white/10 px-6 py-4 sm:px-8 sm:py-5">
+            <div className="relative border-b border-white/10 px-4 py-4 sm:px-8 sm:py-5">
               <div className="flex items-center justify-between gap-4">
                 {/* Names the subject and chapter, not just "Difficulty". Without
                     it a reader who hits "Start again" gets three new questions
@@ -553,7 +668,14 @@ export default function AdaptiveSection() {
                   <span className="truncate text-[11px] font-bold uppercase tracking-[0.16em] text-forest-300">
                     {subject.subject}
                   </span>
-                  <span className="truncate text-[11.5px] text-white/55">{subject.chapter}</span>
+                  <span className="hidden truncate text-[11.5px] text-white/55 min-[400px]:inline">
+                    {subject.chapter}
+                  </span>
+                  {/* Labelled as a sample, like every demo on the page: these
+                      are illustrative questions, not a real student's test. */}
+                  <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white/60">
+                    Sample
+                  </span>
                 </span>
                 {touched && (
                   <button
@@ -579,7 +701,7 @@ export default function AdaptiveSection() {
                           and still reads as clearly active next to the dim
                           rungs. */}
                       <div
-                        className={`rounded-xl px-3 py-2.5 transition-all duration-500 ${
+                        className={`rounded-xl px-2 py-2.5 transition-all duration-500 min-[400px]:px-3 ${
                           on
                             ? "bg-forest-600 text-white"
                             : cleared
@@ -592,7 +714,7 @@ export default function AdaptiveSection() {
                               drops back, so progress is never erased. */}
                           <span
                             aria-hidden
-                            className={`grid h-4 w-4 shrink-0 place-items-center rounded-full transition-colors duration-500 ${
+                            className={`hidden h-4 w-4 shrink-0 place-items-center rounded-full transition-colors duration-500 min-[400px]:grid ${
                               on
                                 ? "bg-white/25 text-white"
                                 : cleared
@@ -606,7 +728,7 @@ export default function AdaptiveSection() {
                               <Minus className="h-2.5 w-2.5" />
                             ) : null}
                           </span>
-                          <span className="truncate text-[13px] font-bold tracking-[-0.01em]">
+                          <span className="truncate text-[12px] font-bold tracking-[-0.01em] min-[400px]:text-[13px]">
                             {level}
                           </span>
                         </div>
@@ -629,7 +751,7 @@ export default function AdaptiveSection() {
             {/* ---- the question ----
                 Plain content now, not a card: the panel it used to sit inside is
                 gone, so this simply fills the body of the single outer panel. */}
-            <div className="ad-body relative flex flex-1 flex-col p-6 sm:p-8">
+            <div className="ad-body relative flex flex-1 flex-col p-4 min-[400px]:p-6 sm:p-8">
               {/* No texture layer and no level label here: the outer panel
                     already carries the texture, and the difficulty strip above
                     names the level. Both were duplicated when the two cards
@@ -658,13 +780,13 @@ export default function AdaptiveSection() {
                     <MagneticButton
                       as="a"
                       href={APP_URL}
-              {...EXTERNAL_LINK_PROPS}
+                      {...EXTERNAL_LINK_PROPS}
                       variant="solid"
                       size="lg"
                       roll={false}
                       className="group"
                     >
-                      Practise on your own books
+                      Practice on your own books
                       <span className="relative grid h-5 w-5 place-items-center overflow-hidden">
                         <ArrowUpRight className="h-5 w-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-5 group-hover:translate-x-5" />
                         <ArrowUpRight className="absolute h-5 w-5 -translate-x-5 translate-y-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:translate-y-0" />

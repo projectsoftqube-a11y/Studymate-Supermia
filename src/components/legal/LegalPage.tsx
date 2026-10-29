@@ -30,10 +30,11 @@
  */
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ArrowUpRight, ChevronDown, Mail, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Mail, ShieldCheck } from "lucide-react";
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
 import { SiteHeader } from "@/components/sections/SiteHeader";
 import Footer from "@/components/sections/Footer";
+import type { SitePage } from "@/content/pages";
 import type { LegalBlock, LegalDoc } from "@/content/legal";
 
 /**
@@ -229,7 +230,15 @@ function TableOfContents({
   );
 }
 
-export default function LegalPage({ doc, other }: { doc: LegalDoc; other: LegalDoc }) {
+export default function LegalPage({
+  page,
+  doc,
+  other,
+}: {
+  page: SitePage;
+  doc: LegalDoc;
+  other: LegalDoc;
+}) {
   /* Same scroll behaviour as the marketing page, installed once here rather than
      per route. It also owns in-page anchor clicks — without it, the table of
      contents links would jump under the fixed header instead of easing to a
@@ -252,6 +261,7 @@ export default function LegalPage({ doc, other }: { doc: LegalDoc; other: LegalD
           page is visibly the same site. Top padding clears the fixed header
           capsule, which is `position: fixed` and does not reserve space. */}
       <header
+        id="content"
         /* Vertical rhythm only. The horizontal padding belongs to the inner
            container, not here — see the note on that element. */
         className="relative isolate overflow-clip pb-14 pt-32 sm:pb-20 sm:pt-36"
@@ -290,17 +300,6 @@ export default function LegalPage({ doc, other }: { doc: LegalDoc; other: LegalD
             The copy inside is narrowed separately: a container is for alignment,
             a measure is for reading. */}
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-          {/* Back to the site, not a breadcrumb trail: the hierarchy is one
-              level deep, so "Home / Privacy Policy" would be two labels to say
-              one thing. */}
-          <a
-            href="/"
-            className="group inline-flex items-center gap-2 text-[13px] font-bold text-white/55 transition-colors duration-300 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-400"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
-            Back to StudyMate
-          </a>
-
           <span className="mt-8 flex items-center gap-4">
             <span
               aria-hidden

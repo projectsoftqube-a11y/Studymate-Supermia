@@ -165,7 +165,7 @@ export default function AnalyticsSection() {
       mm.add("(prefers-reduced-motion: reduce)", () => {
         /* No build: show the finished dashboard, since the data is the point. */
         gsap.set(".an-eyebrow, .an-heading, .an-sub, .an-board, .an-stat, .an-area, .an-dot", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
         /* The arc has no dash attributes of its own now, so its resting length
@@ -224,16 +224,26 @@ export default function AnalyticsSection() {
             {/* Plain words a 14-year-old reads without pausing. "Studying you can
                 measure, chapter by chapter" was the kind of line that sounds
                 considered and communicates nothing at a glance. */}
-            <span className="block">See exactly what</span>
+            <span className="block">See Which Chapters</span>{" "}
             <span className="font-hand mt-1 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-600">
-              to study next
+              to Study Next
             </span>
           </h2>
 
           <p className="an-sub mx-auto mt-6 max-w-xl text-pretty text-[1.0625rem] leading-relaxed text-forest-950/70">
-            Finish a test and get your score right away. StudyMate shows you which chapters you have
-            got, and which ones still need work.
+            After each test, StudyMate shows which chapters have been covered and how the student
+            scored in each, ranked weakest first. Starting with the weakest chapter puts revision
+            time where scores are lowest.
           </p>
+
+          {/* What the dashboard below is made of, stated as text: the panel
+              itself is sample UI, and its labels alone do not say what each
+              figure means. */}
+          <ul className="an-sub mx-auto mt-6 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] font-semibold text-forest-950/70">
+            <li>Average score across all tests so far</li>
+            <li>Topics learned and days in a row of study</li>
+            <li>What to study next, weakest chapter first</li>
+          </ul>
         </div>
 
         {/* ---------- the dashboard ---------- */}
@@ -273,7 +283,9 @@ export default function AnalyticsSection() {
             </span>
             {/* Honest labelling: these are illustrative figures, and the UI says
                 so rather than implying they are a real student's results. */}
-            <span className="hidden shrink-0 text-[10px] font-bold uppercase tracking-[0.14em] text-white/30 sm:block">
+            {/* Visible at every width: it was `hidden sm:block`, so on phones the
+                figures appeared with nothing saying they were not real. */}
+            <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
               Sample data
             </span>
           </div>

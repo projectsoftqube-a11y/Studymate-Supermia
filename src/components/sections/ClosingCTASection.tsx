@@ -17,8 +17,8 @@ gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
  */
 const RECAP = [
   { Icon: BookOpen, label: "Chat through any chapter" },
-  { Icon: MessageCircleQuestion, label: "Practise at your own level" },
-  { Icon: LineChart, label: "See exactly what to study next" },
+  { Icon: MessageCircleQuestion, label: "Practice at their own level" },
+  { Icon: LineChart, label: "See which chapters to study next" },
 ] as const;
 
 /**
@@ -90,7 +90,7 @@ export default function ClosingCTASection() {
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".cc-eyebrow, .cc-heading, .cc-sub, .cc-cta, .cc-recap li", {
-          clearProps: "all",
+          clearProps: "opacity,transform,visibility,filter",
           opacity: 1,
         });
       });
@@ -103,7 +103,7 @@ export default function ClosingCTASection() {
       {/* Dark panel, matching the hero. The page opens and closes on the same
           note, which frames everything between as one body. */}
       <div
-        className="relative overflow-clip px-4 py-20 sm:px-6 sm:py-32 lg:px-10"
+        className="relative overflow-clip px-4 py-14 sm:px-6 sm:py-20 lg:px-10"
         style={{
           background:
             "radial-gradient(120% 110% at 50% 0%, var(--forest-800), var(--forest-950) 58%)",
@@ -133,7 +133,7 @@ export default function ClosingCTASection() {
           }}
         />
 
-        <div className="relative mx-auto max-w-3xl text-center">
+        <div className="relative mx-auto max-w-5xl text-center">
           <span className="cc-eyebrow flex items-center justify-center gap-4">
             <span
               aria-hidden
@@ -156,19 +156,22 @@ export default function ClosingCTASection() {
             />
           </span>
 
-          <h2 className="cc-heading mt-7 text-balance font-display text-[clamp(1.75rem,7.5vw,4rem)] font-extrabold leading-[1.02] tracking-[-0.04em] text-white">
-            <span className="block">Open a chapter</span>
-            <span className="font-hand mt-4 block pr-[0.06em] text-[1.12em] font-bold leading-[0.95] text-forest-300">
-              you're stuck on
+          <h2 className="cc-heading mt-5 text-balance font-display text-[clamp(1.6rem,4.6vw,3.25rem)] font-extrabold leading-[1.02] tracking-[-0.04em] text-white">
+            <span className="block sm:whitespace-nowrap">Start With the Chapter</span>{" "}
+            <span className="font-hand mt-1 block pr-[0.06em] sm:whitespace-nowrap text-[1.08em] font-bold leading-[0.95] text-forest-300">
+              That&apos;s Hardest Right Now
             </span>
           </h2>
 
-          <p className="cc-sub mx-auto mt-7 max-w-xl text-pretty text-[1.0625rem] leading-relaxed text-white/70 sm:text-[1.125rem]">
-            That is the fastest way to find out whether this works for you. It takes about thirty
-            seconds to start, and nothing to lose if it does not.
+          {/* Addressed to the adult deciding, per the content package: copy
+              describes what the student does rather than directing a child to
+              use AI. */}
+          <p className="cc-sub mx-auto mt-5 max-w-2xl text-pretty text-[1rem] leading-relaxed text-white/70 sm:text-[1.0625rem]">
+            The quickest way to judge StudyMate is to open a chapter your child has been avoiding
+            and ask it something. It takes about five minutes to set up and costs nothing to try.
           </p>
 
-          <div className="cc-cta mt-9 flex flex-col items-center gap-4">
+          <div className="cc-cta mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             {/* Straight to the app. This pointed at `#adaptive` only while no
                 signup destination existed. */}
             <MagneticButton
@@ -180,7 +183,7 @@ export default function ClosingCTASection() {
               roll={false}
               className="group"
             >
-              Start learning free
+              Start free
               <span className="relative grid h-5 w-5 place-items-center overflow-hidden">
                 <ArrowUpRight className="h-5 w-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-5 group-hover:translate-x-5" />
                 <ArrowUpRight className="absolute h-5 w-5 -translate-x-5 translate-y-5 transition-transform duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:translate-y-0" />
@@ -199,10 +202,17 @@ export default function ClosingCTASection() {
               <span aria-hidden className="hidden h-3.5 w-px bg-white/20 sm:block" />
               <span className="text-[13px] font-semibold text-white/60">No card required</span>
             </span>
+
+            <a
+              href="mailto:hello@supermia.ai"
+              className="text-[14px] font-bold text-white/70 underline decoration-white/25 underline-offset-4 transition-colors duration-300 hover:text-white hover:decoration-white/60"
+            >
+              Email us a question
+            </a>
           </div>
 
           {/* Recap of what was already shown, not new claims. */}
-          <ul className="cc-recap mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 border-t border-white/10 pt-8">
+          <ul className="cc-recap mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 border-t border-white/10 pt-6">
             {RECAP.map(({ Icon, label }) => (
               <li key={label} className="flex items-center gap-2">
                 <Icon className="h-[15px] w-[15px] shrink-0 text-forest-300" />
